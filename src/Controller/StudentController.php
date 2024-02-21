@@ -68,15 +68,16 @@ class StudentController extends AbstractController
 
         // Instantiate a new Car at null value
         $car = null;
-        //Check if the car and matriculation fields are present
-        if (isset($data['car']) && isset($data['matriculation'])) {
+        //Check if the car, matriculation and cumber of places fields are present
+        if (isset($data['car']) && isset($data['matriculation']) && isset($data['number_places'])) {
             $car = $em->getRepository(Car::class)->findOneBy(['carModel' => $data['car']]);
 
             if (!$car) {
                 $car = new Car();
                 $car->setCarModel($data['car']);
                 $car->setMatriculation($data['matriculation']);
-                // Si vous avez une entité Brand, vous pouvez également la définir ici
+                $car->setNumberPlaces($data['number_places']);
+                // Check if the brand field is present and create a new Brand entity if it does not exist
                 if (isset($data['brand'])) {
                     $brand = $em->getRepository(Brand::class)->findOneBy(['carBrand' => $data['brand']]);
                     if (!$brand) {
@@ -107,4 +108,7 @@ class StudentController extends AbstractController
             'message' => 'Profile updated successfully',
         ]);
     }
+
+
+
 }

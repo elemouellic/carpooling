@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CarRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
@@ -21,6 +22,9 @@ class Car
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     private ?Brand $identify = null;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $numberPlaces = null;
 
     public function getId(): ?int
     {
@@ -59,6 +63,18 @@ class Car
     public function setIdentify(?Brand $identify): static
     {
         $this->identify = $identify;
+
+        return $this;
+    }
+
+    public function getNumberPlaces(): ?int
+    {
+        return $this->numberPlaces;
+    }
+
+    public function setNumberPlaces(int $numberPlaces): static
+    {
+        $this->numberPlaces = $numberPlaces;
 
         return $this;
     }
