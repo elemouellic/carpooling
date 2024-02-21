@@ -175,6 +175,92 @@ class StudentController extends AbstractController
         return $this->json([
             'message' => 'Student updated successfully',
         ]);
+
+
+    }
+
+#[Route('/deletestudent/{id}', name: 'app_student_delete', methods: ['DELETE'])]
+public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
+{
+    // Check if the current user has the 'ROLE_ADMIN' role
+    if (!$this->isGranted('ROLE_ADMIN')) {
+        return $this->json([
+            'error' => 'Access denied',
+        ], 403);
+    }
+
+    // Get the student from the database using the id
+    $student = $em->getRepository(Student::class)->find($id);
+
+    // If the student is not found, return an error
+    if (!$student) {
+        return $this->json([
+            'error' => 'Student not found',
+        ], 404);
+    }
+
+    // Check if the student is an admin
+    if (in_array('ROLE_ADMIN', $student->getRegister()->getRoles())) {
+        return $this->json([
+            'error' => 'Cannot delete an admin',
+        ], 403);
+    }
+
+    // Remove the student from the database
+    $em->remove($student);
+    $em->flush();
+
+    return $this->json([
+        'message' => 'Student deleted successfully',
+    ]);
+}
+    #[Route('/selectstudent/{id}', name: 'app_student_get', methods: ['GET'])]
+    public function getStudent(int $id, EntityManagerInterface $em, Request $request): JsonResponse
+    {
+        // Get the student from the database using the id
+        $student = $em->getRepository(Student::class)->find($id);
+
+        // If the student is not found, return an error
+        if (!$student) {
+            return $this->json([
+                'error' => 'Student not found',
+            ], 404);
+        }
+
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+
+        // Get the user from the database using the token
+        $user = $em->getRepository(User::class)->findOneBy(['token' => $token]);
+
+        // If the user is not found, return an error
+        if (!$user) {
+            return $this->json([
+                'error' => 'Invalid token',
+            ], 401);
+        }
+
+        // Check if the current user is the same as the student's register
+        if ($user !== $student->getRegister()) {
+            return $this->json([
+                'error' => 'Access denied',
+            ], 403);
+        }
+
+        // Return the student data
+        return $this->json([
+            'id' => $student->getId(),
+            'firstname' => $student->getFirstname(),
+            'name' => $student->getName(),
+            'phone' => $student->getPhone(),
+            'email' => $student->getEmail(),
+            'city' => $student->getLive()->getName(),
+            'zip_code' => $student->getLive()->getZipCode(),
+            'car' => $student->getPossess() ? $student->getPossess()->getCarModel() : null,
+            'matriculation' => $student->getPossess() ? $student->getPossess()->getMatriculation() : null,
+            'number_places' => $student->getPossess() ? $student->getPossess()->getNumberPlaces() : null,
+            'brand' => $student->getPossess() && $student->getPossess()->getIdentify() ? $student->getPossess()->getIdentify()->getCarBrand() : null,
+        ]);
     }
 
 
