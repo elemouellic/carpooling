@@ -109,6 +109,73 @@ class StudentController extends AbstractController
         ]);
     }
 
+    #[Route('/updatestudent', name: 'app_student_update', methods: ['PUT'])]
+    public function updateStudent(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        // Get the request data
+        $data = json_decode($request->getContent(), true);
+
+        // Check if all necessary fields are present and not empty
+        if (empty($data['firstname']) || empty($data['name']) || empty($data['phone']) || empty($data['email']) || empty($data['idstudent'])) {
+            return $this->json([
+                'error' => 'Missing one or more required fields',
+            ], 400);
+        }
+
+        // Get the student from the database using the idstudent
+        $student = $em->getRepository(Student::class)->find($data['idstudent']);
+
+        // If the student is not found, return an error
+        if (!$student) {
+            return $this->json([
+                'error' => 'Student not found',
+            ], 404);
+        }
+
+        // Update the student entity with the request data
+        $student->setFirstname($data['firstname']);
+        $student->setName($data['name']);
+        $student->setPhone($data['phone']);
+        $student->setEmail($data['email']);
+
+        // Check if the car, matriculation and number of places fields are present
+        if (isset($data['car']) && isset($data['matriculation']) && isset($data['number_places'])) {
+            $car = $student->getPossess();
+            if (!$car) {
+                $car = new Car();
+                $student->setPossess($car);
+            }
+            $car->setCarModel($data['car']);
+            $car->setMatriculation($data['matriculation']);
+            $car->setNumberPlaces($data['number_places']);
+            // Check if the brand field is present and update the Brand entity if it exists
+            if (isset($data['brand'])) {
+                $brand = $car->getIdentify();
+                if (!$brand) {
+                    $brand = new Brand();
+                    $brand->setCarBrand($data['brand']);
+                    $car->setIdentify($brand);
+                    $em->persist($brand);
+                } else {
+                    $brand->setCarBrand($data['brand']);
+                }
+            }
+            $em->persist($car);
+        } else {
+            // If the car information is not present in the request, remove the Car from the Student
+            $car = $student->getPossess();
+            if ($car) {
+                $student->setPossess(null);
+                $em->remove($car);
+            }
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Student updated successfully',
+        ]);
+    }
 
 
 }
