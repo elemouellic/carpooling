@@ -17,10 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class StudentController extends AbstractController
 {
 
-    /**
-     * @throws Exception
-     */
-    #[Route('/insertStudent', name: 'app_student_insert', methods: ['POST'])]
+    #[Route('/insertstudent', name: 'app_student_insert', methods: ['POST'])]
     public function insertStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
         // Get the request data
@@ -91,20 +88,18 @@ class StudentController extends AbstractController
                 }
                 $em->persist($car);
             }
-        } else{
-            throw new Exception('Car and matriculation fields are required');
         }
 
-
-
-// Mettez à jour les champs du profil de l'étudiant
+        // Update the student entity with the request data
         $student->setFirstname($data['firstname']);
         $student->setName($data['name']);
         $student->setPhone($data['phone']);
         $student->setEmail($data['email']);
         $student->setLive($city);
         // Null if the student does not have a car
-        $student->setPossess($car);
+        if ($car !== null) {
+            $student->setPossess($car);
+        }
         $em->persist($student);
         $em->flush();
 
