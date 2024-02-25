@@ -248,4 +248,135 @@ class TripController extends AbstractController
             'message' => 'Trip deleted',
         ]);
     }
+
+    // This routes refer to the association table between the trip and the student
+    #[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
+    public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        // Check if all necessary fields are present and not empty
+        if (empty($data['trip_id']) || empty($data['student_id'])) {
+            return $this->json([
+                'error' => 'Missing one or more required fields',
+            ], 400);
+        }
+
+        // Get the Trip and Student entities from the database
+        $trip = $em->getRepository(Trip::class)->find($data['trip_id']);
+        $student = $em->getRepository(Student::class)->find($data['student_id']);
+
+        if (!$trip || !$student) {
+            return $this->json([
+                'error' => 'Trip or Student not found',
+            ], 404);
+        }
+
+        // Check if the student is already participating in the trip
+        if ($trip->getStudents()->contains($student)) {
+            return $this->json([
+                'error' => 'The student is already participating in the trip',
+            ], 400);
+        }
+
+        // Add the student to the trip
+        $trip->addStudent($student);
+
+        // Save the new participation
+        $em->persist($trip);
+        $em->flush();
+
+        // Return a success message
+        return $this->json([
+            'message' => 'Participation added successfully',
+        ]);
+    }
+
+    #[Route('/listallparticipations', name: 'app_trip_list_participation', methods: ['GET'])]
+    public function listAllParticipations(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        // Check if the current user has the 'ROLE_ADMIN' role
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->json([
+                'error' => 'Access denied',
+            ], 403);
+        }
+
+        // Get the participations from the database
+        $participations = $em->getRepository(Trip::class)->createQueryBuilder('t')
+            ->leftJoin('t.students', 's')
+            ->addSelect('s')
+            ->getQuery()
+            ->getResult();
+
+        $data = [];
+        foreach ($participations as $participation) {
+            $studentsData = [];
+            foreach ($participation->getStudents() as $student) {
+                $studentsData[] = [
+                    'id' => $student->getId(),
+                    'name' => $student->getName(),
+                    'firstname' => $student->getFirstname(),
+                    'email' => $student->getEmail()
+                ];
+            }
+            $data[] = [
+                'id' => $participation->getId(),
+                'trip' => $participation->getId(),
+                'driver' => [
+                    'id' => $participation->getStudent()->getId(),
+                    'name' => $participation->getStudent()->getName(),
+                    'firstname' => $participation->getStudent()->getFirstname(),
+                    'email' => $participation->getStudent()->getEmail(),
+                ],
+                'students' => $studentsData
+            ];
+        }
+        // Return the participations data
+        return $this->json($data);
+    }//
+//    #[Route('/deleteparticipation/{id}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
+//    public function deleteParticipation(Request $request, int $id, EntityManagerInterface $em): JsonResponse
+//    {
+//        // Check if the current user has the 'ROLE_ADMIN' role
+//        if (!$this->isGranted('ROLE_ADMIN')) {
+//            return $this->json([
+//                'error' => 'Access denied',
+//            ], 403);
+//        }
+//
+//        // Get the token from the request headers
+//        $token = $request->headers->get('X-AUTH-TOKEN');
+//        try {
+//            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+//        } catch (Exception $e) {
+//            return new JsonResponse(['error' => $e->getMessage()], 404);
+//        }
+//
+//        // Get the participation from the database using the id
+//        $participation = $em->getRepository(Trip::class)->find($id);
+//
+//        // If the participation is not found, return an error
+//        if (!$participation) {
+//            return $this->json([
+//                'error' => 'Participation not found',
+//            ], 404);
+//        }
+//
+//        // Remove the participation from the database
+//        $em->remove($participation);
+//        $em->flush();
+//
+//        // Return a success message
+//        return $this->json([
+//            'message' => 'Participation deleted',
+//        ]);
+//    }
 }
