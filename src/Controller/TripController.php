@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\Trip;
@@ -48,10 +49,25 @@ class TripController extends AbstractController
         $startingCity = $em->getRepository(City::class)->find($data['starting_trip']);
         $arrivalCity = $em->getRepository(City::class)->find($data['arrival_trip']);
 
+
         if (!$student || !$startingCity || !$arrivalCity) {
             return $this->json([
                 'error' => 'Student or City not found',
             ], 404);
+        }
+
+        $car = $student->getPossess();
+        if (!$car) {
+            return $this->json([
+                'error' => 'The student does not have a car',
+            ], 400);
+        }
+
+        $seats = $car->getNumberPlaces();
+        if ($data['places_offered'] != $seats - 1) {
+            return $this->json([
+                'error' => 'The number of offered places does not correspond to the number of seats in the car minus one',
+            ], 400);
         }
 
         // Check if a trip with the same student, travel date, starting city and arrival city already exists
@@ -108,46 +124,46 @@ class TripController extends AbstractController
         return new JsonResponse($result);
     }
 
-#[Route('/searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
-public function searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel): JsonResponse
-{
-    // Get the token from the request headers
-    $token = $request->headers->get('X-AUTH-TOKEN');
-    try {
-        $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-    } catch (Exception $e) {
-        return new JsonResponse(['error' => $e->getMessage()], 404);
-    }
+    #[Route('/searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
+    public function searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel): JsonResponse
+    {
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
 
-    // Convert the date string to a DateTime object
-    try {
-        $dateTravel = new \DateTime($dateTravel);
-    } catch (\Exception $e) {
-        return new JsonResponse(['error' => $e->getMessage()], 400);
-    }
+        // Convert the date string to a DateTime object
+        try {
+            $dateTravel = new \DateTime($dateTravel);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
+        }
 
-    // Get the trip from the database
-    $trips = $em->getRepository(Trip::class)->findBy([
-        'startingTrip' => $idCityStart,
-        'arrivalTrip' => $idCityArrival,
-        'travelDate' => $dateTravel,
-    ]);
+        // Get the trip from the database
+        $trips = $em->getRepository(Trip::class)->findBy([
+            'startingTrip' => $idCityStart,
+            'arrivalTrip' => $idCityArrival,
+            'travelDate' => $dateTravel,
+        ]);
 
-    $data = [];
-    foreach ($trips as $trip) {
-        $data[] = [
-            'id' => $trip->getId(),
-            'student' => $trip->getStudent()->getId(),
-            'starting_trip' => $trip->getStartingTrip()->getId(),
-            'arrival_trip' => $trip->getArrivalTrip()->getId(),
-            'km_distance' => $trip->getKmDistance(),
-            'travel_date' => $trip->getTravelDate()->format('Y-m-d'), // Format the date
-            'places_offered' => $trip->getPlacesOffered(),
-        ];
+        $data = [];
+        foreach ($trips as $trip) {
+            $data[] = [
+                'id' => $trip->getId(),
+                'student' => $trip->getStudent()->getId(),
+                'starting_trip' => $trip->getStartingTrip()->getId(),
+                'arrival_trip' => $trip->getArrivalTrip()->getId(),
+                'km_distance' => $trip->getKmDistance(),
+                'travel_date' => $trip->getTravelDate()->format('Y-m-d'), // Format the date
+                'places_offered' => $trip->getPlacesOffered(),
+            ];
+        }
+        // Return the brands data
+        return $this->json($data);
     }
-    // Return the brands data
-    return $this->json($data);
-}
 
 
     #[Route('/listalltrips', name: 'app_trip_list', methods: ['GET'])]
@@ -177,5 +193,43 @@ public function searchTrip(Request $request, EntityManagerInterface $em, $idCity
         }
         // Return the brands data
         return $this->json($data);
+    }
+
+    #[Route('/deletetrip/{id}', name: 'app_trip_delete', methods: ['DELETE'])]
+    public function deleteTrip(Request $request, int $id, EntityManagerInterface $em): JsonResponse
+    {
+        // Check if the current user has the 'ROLE_ADMIN' role
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->json([
+                'error' => 'Access denied',
+            ], 403);
+        }
+
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
+        // Get the trip from the database using the id
+        $trip = $em->getRepository(Trip::class)->find($id);
+
+        // If the trip is not found, return an error
+        if (!$trip) {
+            return $this->json([
+                'error' => 'Trip not found',
+            ], 404);
+        }
+
+        // Remove the trip from the database
+        $em->remove($trip);
+        $em->flush();
+
+        // Return a success message
+        return $this->json([
+            'message' => 'Trip deleted',
+        ]);
     }
 }
