@@ -128,8 +128,8 @@ class TripController extends AbstractController
                 'student' => $student->getId(),
                 'km_distance' => $trip->getKmDistance(),
                 'travel_date' => $trip->getTravelDate(),
-                'starting_trip' => $trip->getStartingTrip(),
-                'arrival_trip' => $trip->getArrivalTrip(),
+                'starting_trip' => $startingCity->getName(),
+                'arrival_trip' => $arrivalCity->getName(),
                 'places_offered' => $trip->getPlacesOffered(),
             ];
 
@@ -341,42 +341,47 @@ class TripController extends AbstractController
         }
         // Return the participations data
         return $this->json($data);
-    }//
-//    #[Route('/deleteparticipation/{id}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
-//    public function deleteParticipation(Request $request, int $id, EntityManagerInterface $em): JsonResponse
-//    {
-//        // Check if the current user has the 'ROLE_ADMIN' role
-//        if (!$this->isGranted('ROLE_ADMIN')) {
-//            return $this->json([
-//                'error' => 'Access denied',
-//            ], 403);
-//        }
-//
-//        // Get the token from the request headers
-//        $token = $request->headers->get('X-AUTH-TOKEN');
-//        try {
-//            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-//        } catch (Exception $e) {
-//            return new JsonResponse(['error' => $e->getMessage()], 404);
-//        }
-//
-//        // Get the participation from the database using the id
-//        $participation = $em->getRepository(Trip::class)->find($id);
-//
-//        // If the participation is not found, return an error
-//        if (!$participation) {
-//            return $this->json([
-//                'error' => 'Participation not found',
-//            ], 404);
-//        }
-//
-//        // Remove the participation from the database
-//        $em->remove($participation);
-//        $em->flush();
-//
-//        // Return a success message
-//        return $this->json([
-//            'message' => 'Participation deleted',
-//        ]);
-//    }
+    }
+
+    #[Route('/deleteparticipation/{tripid}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
+    public function deleteParticipation(Request $request, int $tripid, EntityManagerInterface $em): JsonResponse
+    {
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
+        // Get the trip from the database using the id
+        $trip = $em->getRepository(Trip::class)->find($tripid);
+
+        // If the trip is not found, return an error
+        if (!$trip) {
+            return $this->json([
+                'error' => 'Trip not found',
+            ], 404);
+        }
+
+        // Check if the user is a participant of the trip
+        if (!$trip->getStudents()->contains($trip->getStudent())) {
+            return $this->json([
+                'error' => 'You are not a participant of this trip',
+            ], 403);
+        }
+
+        // Remove the user from the trip participants
+        $trip->removeStudent($trip->getStudent());
+
+        // Save the changes
+        $em->persist($trip);
+        $em->flush();
+
+        // Return a success message
+        return $this->json([
+            'message' => 'Participation deleted',
+        ]);
+    }
+
 }
