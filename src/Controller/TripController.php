@@ -384,4 +384,78 @@ class TripController extends AbstractController
         ]);
     }
 
+    #[Route('/getdriverontrip/{tripid}', name: 'app_trip_get_driver', methods: ['GET'])]
+    public function getDriverOnTrip(Request $request, EntityManagerInterface $em, $tripid): JsonResponse
+    {
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
+        // Get the trip from the database using the id
+        $trip = $em->getRepository(Trip::class)->find($tripid);
+
+        // If the trip is not found, return an error
+        if (!$trip) {
+            return $this->json([
+                'error' => 'Trip not found',
+            ], 404);
+        }
+
+        // Get the driver from the trip
+        $driver = $trip->getStudent();
+
+        // Prepare the driver data
+        $data = [
+            'id' => $driver->getId(),
+            'name' => $driver->getName(),
+            'firstname' => $driver->getFirstname(),
+            'email' => $driver->getEmail(),
+        ];
+
+        // Return the driver data
+        return $this->json($data);
+    }
+
+#[Route('/getstudentontrips/{studentid}', name: 'app_trip_get_student', methods: ['GET'])]
+    public function getStudentOnTrips(Request $request, EntityManagerInterface $em, $studentid): JsonResponse
+    {
+        // Get the token from the request headers
+        $token = $request->headers->get('X-AUTH-TOKEN');
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
+        // Get the student from the database using the id
+        $student = $em->getRepository(Student::class)->find($studentid);
+
+        // If the student is not found, return an error
+        if (!$student) {
+            return $this->json([
+                'error' => 'Student not found',
+            ], 404);
+        }
+
+        // Get the trips of the student
+        $trips = $student->getDrive();
+
+        $data = [];
+        foreach ($trips as $trip) {
+            $data[] = [
+                'id' => $trip->getId(),
+                'starting_trip' => $trip->getStartingTrip()->getId(),
+                'arrival_trip' => $trip->getArrivalTrip()->getId(),
+                'km_distance' => $trip->getKmDistance(),
+                'travel_date' => $trip->getTravelDate()->format('Y-m-d'), // Format the date
+                'places_offered' => $trip->getPlacesOffered(),
+            ];
+        }
+        // Return the trips data
+        return $this->json($data);
+    }
 }
