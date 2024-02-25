@@ -8,6 +8,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class BrandController extends AbstractController
 {
+//    #[Route('/brand', name: 'app_brand')]
+//    public function index(): JsonResponse
+//    {
+//        return $this->json([
+//            'message' => 'Welcome to your new controller!',
+//            'path' => 'src/Controller/BrandController.php',
+//        ]);
+//    }
+
     #[Route('/brand', name: 'app_brand')]
     public function index(): JsonResponse
     {

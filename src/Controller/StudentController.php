@@ -7,7 +7,6 @@ use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\User;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -179,41 +178,42 @@ class StudentController extends AbstractController
 
     }
 
-#[Route('/deletestudent/{id}', name: 'app_student_delete', methods: ['DELETE'])]
-public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
-{
-    // Check if the current user has the 'ROLE_ADMIN' role
-    if (!$this->isGranted('ROLE_ADMIN')) {
+    #[Route('/deletestudent/{id}', name: 'app_student_delete', methods: ['DELETE'])]
+    public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
+    {
+        // Check if the current user has the 'ROLE_ADMIN' role
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->json([
+                'error' => 'Access denied',
+            ], 403);
+        }
+
+        // Get the student from the database using the id
+        $student = $em->getRepository(Student::class)->find($id);
+
+        // If the student is not found, return an error
+        if (!$student) {
+            return $this->json([
+                'error' => 'Student not found',
+            ], 404);
+        }
+
+        // Check if the student is an admin
+        if (in_array('ROLE_ADMIN', $student->getRegister()->getRoles())) {
+            return $this->json([
+                'error' => 'Cannot delete an admin',
+            ], 403);
+        }
+
+        // Remove the student from the database
+        $em->remove($student);
+        $em->flush();
+
         return $this->json([
-            'error' => 'Access denied',
-        ], 403);
+            'message' => 'Student deleted successfully',
+        ]);
     }
 
-    // Get the student from the database using the id
-    $student = $em->getRepository(Student::class)->find($id);
-
-    // If the student is not found, return an error
-    if (!$student) {
-        return $this->json([
-            'error' => 'Student not found',
-        ], 404);
-    }
-
-    // Check if the student is an admin
-    if (in_array('ROLE_ADMIN', $student->getRegister()->getRoles())) {
-        return $this->json([
-            'error' => 'Cannot delete an admin',
-        ], 403);
-    }
-
-    // Remove the student from the database
-    $em->remove($student);
-    $em->flush();
-
-    return $this->json([
-        'message' => 'Student deleted successfully',
-    ]);
-}
     #[Route('/selectstudent/{id}', name: 'app_student_get', methods: ['GET'])]
     public function getStudent(int $id, EntityManagerInterface $em, Request $request): JsonResponse
     {
