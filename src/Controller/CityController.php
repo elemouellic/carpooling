@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\City;
+use App\Security\TokenAuth;
 use App\Security\TokenUserProvider;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class CityController extends AbstractController
 {
@@ -21,17 +23,24 @@ class CityController extends AbstractController
 //            'path' => 'src/Controller/CityController.php',
 //        ]);
 //    }
-    private TokenUserProvider $tokenUserProvider;
+    private TokenAuth $tokenAuth;
 
-    public function __construct(TokenUserProvider $tokenUserProvider)
+    public function __construct(TokenAuth $tokenAuth)
     {
-        $this->tokenUserProvider = $tokenUserProvider;
+        $this->tokenAuth = $tokenAuth;
     }
 
 
     #[Route('/insertcity', name: 'app_city_insert', methods: ['POST'])]
     public function insertCity(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        try {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         // Check if all necessary fields are present and not empty
@@ -53,13 +62,6 @@ class CityController extends AbstractController
             ], 400);
         }
 
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         try {
             // Create a new city
@@ -87,16 +89,16 @@ class CityController extends AbstractController
 #[Route('/deletecity/{id}', name: 'app_city_delete', methods: ['DELETE'])]
     public function deleteCity(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
+        // Check if the current user has the 'ROLE_ADMIN' role
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->json([
+                'error' => 'Access denied',
+            ], 403);
+        }
+
         // Get the city from the database
         $city = $em->getRepository(City::class)->find($id);
 
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // If the city is not found, return an error
         if (!$city) {

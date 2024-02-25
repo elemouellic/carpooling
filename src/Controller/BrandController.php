@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Brand;
+use App\Security\TokenAuth;
 use App\Security\TokenUserProvider;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -11,19 +12,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class BrandController extends AbstractController
 {
-    private TokenUserProvider $tokenUserProvider;
+    private TokenAuth $tokenAuth;
 
-    public function __construct(TokenUserProvider $tokenUserProvider)
+    public function __construct(TokenAuth $tokenAuth)
     {
-        $this->tokenUserProvider = $tokenUserProvider;
+        $this->tokenAuth = $tokenAuth;
     }
 
     #[Route('/insertbrand', name: 'app_brand_insert', methods: ['POST'])]
     public function insertBrand(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        try {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         // Check if all necessary fields are present and not empty
@@ -40,14 +49,6 @@ class BrandController extends AbstractController
             return $this->json([
                 'error' => 'A brand with the same name already exists',
             ], 400);
-        }
-
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
         try {

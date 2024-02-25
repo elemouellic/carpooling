@@ -2,24 +2,34 @@
 
 namespace App\Security;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class TokenAuth extends AbstractAuthenticator{
+class TokenAuth extends AbstractAuthenticator
+{
 
     private EntityManagerInterface $em;
-    public function __construct(EntityManagerInterface $em)
+    private TokenUserProvider $tokenUserProvider;
+    private Security $security;
+
+    public function __construct(EntityManagerInterface $em, TokenUserProvider $tokenUserProvider, Security $security)
     {
         $this->em = $em;
+        $this->tokenUserProvider = $tokenUserProvider;
+        $this->security = $security;
 
     }
 
@@ -53,6 +63,32 @@ class TokenAuth extends AbstractAuthenticator{
         return new SelfValidatingPassport(new UserBadge($apiToken));
     }
 
+    public function getUserFromToken(?string $token): UserInterface
+    {
+        // Check if the token is null
+        if (null === $token) {
+            throw new CustomUserMessageAuthenticationException('No API token provided');
+        }
+
+        // Load the user using the token
+        try {
+            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
+        } catch (Exception $e) {
+            // Throw an authentication exception if the user was not found
+            throw new CustomUserMessageAuthenticationException("Failed to load user from token: " . $e->getMessage());
+        }
+        // If no exception is thrown, return the user
+        return $user;
+    }
+
+    public function checkAdminRole(): void
+    {
+
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            throw new AccessDeniedException('Access denied');
+        }
+    }
+
     /**
      * Called on every request to decide if the authenticator should be
      * used for this request. Returning false will cause this authenticator
@@ -82,6 +118,7 @@ class TokenAuth extends AbstractAuthenticator{
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);
     }
 }
+
 {
 
 }

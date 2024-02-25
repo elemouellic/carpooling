@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\Trip;
+use App\Security\TokenAuth;
 use App\Security\TokenUserProvider;
 use DateTime;
 use Doctrine\DBAL\Exception;
@@ -13,24 +14,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class TripController extends AbstractController
 {
-    private TokenUserProvider $tokenUserProvider;
+    private TokenAuth $tokenAuth;
 
-    public function __construct(TokenUserProvider $tokenUserProvider)
+    public function __construct(TokenAuth $tokenAuth)
     {
-        $this->tokenUserProvider = $tokenUserProvider;
+        $this->tokenAuth = $tokenAuth;
     }
 
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
         try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
@@ -141,11 +142,10 @@ class TripController extends AbstractController
     #[Route('/searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
     public function searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel): JsonResponse
     {
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
         try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
@@ -251,11 +251,10 @@ class TripController extends AbstractController
     #[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
     public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
         try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
@@ -344,11 +343,10 @@ class TripController extends AbstractController
     #[Route('/deleteparticipation/{tripid}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
     public function deleteParticipation(Request $request, int $tripid, EntityManagerInterface $em): JsonResponse
     {
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
         try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
@@ -385,11 +383,10 @@ class TripController extends AbstractController
     #[Route('/getdriverontrip/{tripid}', name: 'app_trip_get_driver', methods: ['GET'])]
     public function getDriverOnTrip(Request $request, EntityManagerInterface $em, $tripid): JsonResponse
     {
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
         try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
@@ -418,14 +415,13 @@ class TripController extends AbstractController
         return $this->json($data);
     }
 
-#[Route('/getstudentontrips/{studentid}', name: 'app_trip_get_student', methods: ['GET'])]
+    #[Route('/getstudentontrips/{studentid}', name: 'app_trip_get_student', methods: ['GET'])]
     public function getStudentOnTrips(Request $request, EntityManagerInterface $em, $studentid): JsonResponse
     {
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
         try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 404);
         }
 
