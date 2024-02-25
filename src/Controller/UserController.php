@@ -22,14 +22,6 @@ class UserController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
-//    #[Route('/user', name: 'app_user')]
-//    public function index(): JsonResponse
-//    {
-//        return $this->json([
-//            'message' => 'Welcome to your new controller!',
-//            'path' => 'src/Controller/UserController.php',
-//        ]);
-//    }
 
     #[Route('/register', name: 'app_user_add', methods: ['POST'])]
     public function register(Request $request, EntityManagerInterface $em): JsonResponse

@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\Trip;
@@ -10,7 +9,6 @@ use App\Security\TokenUserProvider;
 use DateTime;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
-use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
