@@ -70,6 +70,22 @@ class TripController extends AbstractController
             ], 400);
         }
 
+        // Dans votre méthode insertTrip
+        $startingCity = $em->getRepository(City::class)->find($data['starting_trip']);
+        $arrivalCity = $em->getRepository(City::class)->find($data['arrival_trip']);
+
+        if (!$startingCity || !$arrivalCity) {
+            return $this->json([
+                'error' => 'City not found',
+            ], 404);
+        }
+
+        if ($startingCity->getId() == $arrivalCity->getId()) {
+            return $this->json([
+                'error' => 'The departure city cannot be the same as the arrival city',
+            ], 400);
+        }
+
         // Check if a trip with the same student, travel date, starting city and arrival city already exists
         try {
             $existingTrip = $em->getRepository(Trip::class)->findOneBy([
