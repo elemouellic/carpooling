@@ -263,5 +263,40 @@ class StudentController extends AbstractController
         ]);
     }
 
+    #[Route('/listallstudents', name: 'app_student_list', methods: ['GET'])]
+    public function listAllStudents(EntityManagerInterface $em): JsonResponse
+    {
+        // Check if the current user has the 'ROLE_ADMIN' role
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->json([
+                'error' => 'Access denied',
+            ], 403);
+        }
+
+        // Get all students from the database
+        $students = $em->getRepository(Student::class)->findAll();
+
+        // Create an array of students data
+        $result = [];
+        foreach ($students as $student) {
+            $result[] = [
+                'id' => $student->getId(),
+                'firstname' => $student->getFirstname(),
+                'name' => $student->getName(),
+                'phone' => $student->getPhone(),
+                'email' => $student->getEmail(),
+                'city' => $student->getLive()->getName(),
+                'zip_code' => $student->getLive()->getZipCode(),
+                'car' => $student->getPossess() ? $student->getPossess()->getCarModel() : null,
+                'matriculation' => $student->getPossess() ? $student->getPossess()->getMatriculation() : null,
+                'number_places' => $student->getPossess() ? $student->getPossess()->getNumberPlaces() : null,
+                'brand' => $student->getPossess() && $student->getPossess()->getIdentify() ? $student->getPossess()->getIdentify()->getCarBrand() : null,
+            ];
+        }
+
+        // Return the students data
+        return $this->json($result);
+    }
+
 
 }

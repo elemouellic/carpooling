@@ -132,7 +132,7 @@ class CarController extends AbstractController
         ]);
     }
 
-#[Route('/listallcars', name: 'app_car_list', methods: ['GET'])]
+    #[Route('/listallcars', name: 'app_car_list', methods: ['GET'])]
     public function listAllCars(EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
