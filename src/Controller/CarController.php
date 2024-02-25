@@ -36,6 +36,16 @@ class CarController extends AbstractController
                 'error' => 'Missing one or more required fields',
             ], 400);
         }
+
+        // Check if a car with the same matriculation already exists
+        $existingCar = $em->getRepository(Car::class)->findOneBy(['matriculation' => $data['matriculation']]);
+
+        if ($existingCar) {
+            return $this->json([
+                'error' => 'A car with the same matriculation already exists',
+            ], 400);
+        }
+
         // Get the token from the request headers
         $token = $request->headers->get('X-AUTH-TOKEN');
         try {
