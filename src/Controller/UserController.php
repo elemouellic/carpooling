@@ -26,10 +26,10 @@ class UserController extends AbstractController
     #[Route('/register', name: 'app_user_add', methods: ['POST'])]
     public function register(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        // Récupérez les données de la requête
+        // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
-        // Vérifiez si les champs login et password sont présents
+        // Check if all necessary fields are present and not empty
         if (!isset($data['login']) || !isset($data['password'])) {
             return $this->json([
                 'error' => 'Missing login or password',
@@ -50,7 +50,7 @@ class UserController extends AbstractController
 
             $user->setRoles(['ROLE_USER']);
 
-            // Générez un token de session aléatoire et définissez-le pour l'utilisateur
+            // Generate a random token for the user
             $token = bin2hex(random_bytes(10));
             $user->setToken($token);
 
@@ -73,10 +73,10 @@ class UserController extends AbstractController
     #[Route('/login', name: 'app_login', methods: ['POST'])]
     public function login(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        // Récupérez les données de la requête
+        // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
-        // Vérifiez si les champs login et password sont présents
+        // Check if all necessary fields are present and not empty
         if (!isset($data['login']) || !isset($data['password'])) {
             return $this->json([
                 'error' => 'Missing login or password',
@@ -87,13 +87,13 @@ class UserController extends AbstractController
         $login = $data['login'];
         $password = $data['password'];
 
-        // Récupérez l'utilisateur à partir du login
+        // Get the user from the database using the login
         $user = $em->getRepository(User::class)->findOneBy(['login' => $login]);
 
-        // Vérifiez si l'utilisateur existe et si le mot de passe est correct
+        // Check if the user exists and if the password is correct
         if ($user && $passwordHasher->isPasswordValid($user, $password)) {
-            // Si les informations d'identification sont correctes, générez un token de session et renvoyez-le avec l'ID de l'utilisateur
-            $token = bin2hex(random_bytes(10)); // Générez un token de session aléatoire
+            // If the credentials are correct, generate a new token for the user
+            $token = bin2hex(random_bytes(10)); // Generate a random token
             $user->setToken($token);
             $em->flush();
 
@@ -102,7 +102,7 @@ class UserController extends AbstractController
                 'user_id' => $user->getId(),
             ]);
         } else {
-            // Si les informations d'identification ne sont pas correctes, renvoyez un message d'erreur
+            // If the credentials are incorrect, return an error
             return $this->json([
                 'error' => 'Login or password incorrect',
             ], 401);

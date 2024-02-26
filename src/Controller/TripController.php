@@ -5,9 +5,6 @@ namespace App\Controller;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\Trip;
-use App\Security\AdminRoleChecker;
-use App\Security\TokenAuth;
-use App\Security\TokenUserProvider;
 use DateTime;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,11 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class TripController extends AbstractController
 {
-
 
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse

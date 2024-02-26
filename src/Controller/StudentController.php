@@ -6,7 +6,6 @@ use App\Entity\Brand;
 use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
-use App\Entity\User;
 use App\Security\TokenAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -117,7 +116,6 @@ class StudentController extends AbstractController
     public function updateStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
 
-
         // Get the request data
         $data = json_decode($request->getContent(), true);
 
@@ -189,7 +187,6 @@ class StudentController extends AbstractController
     public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
     {
 
-
         // Get the student from the database using the id
         $student = $em->getRepository(Student::class)->find($id);
 
@@ -219,7 +216,6 @@ class StudentController extends AbstractController
     #[Route('/selectstudent/{id}', name: 'app_student_get', methods: ['GET'])]
     public function getStudent(int $id, EntityManagerInterface $em, Request $request): JsonResponse
     {
-
 
         // Get the student from the database using the id
         $student = $em->getRepository(Student::class)->find($id);

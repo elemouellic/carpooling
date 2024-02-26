@@ -3,16 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\City;
-use App\Security\AdminRoleChecker;
-use App\Security\TokenAuth;
-use App\Security\TokenUserProvider;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class CityController extends AbstractController
 {
