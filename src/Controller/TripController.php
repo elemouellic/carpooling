@@ -19,10 +19,10 @@ class TripController extends AbstractController
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse
     {
-
         $data = json_decode($request->getContent(), true);
+
         // Check if all necessary fields are present and not empty
-        if (empty($data['km_distance']) || empty($data['student_id']) || empty($data['travel_date']) || empty($data['starting_trip']) || empty($data['arrival_trip']) || empty($data['places_offered'])) {
+        if (!isset($data['km_distance']) || !isset($data['student_id']) || !isset($data['travel_date']) || !isset($data['starting_trip']) || !isset($data['arrival_trip']) || !isset($data['places_offered']) || $data['km_distance'] === '' || $data['student_id'] === '' || $data['travel_date'] === '' || $data['starting_trip'] === '' || $data['arrival_trip'] === '' || $data['places_offered'] === '') {
             return $this->json([
                 'error' => 'Missing one or more required fields',
             ], 400);
@@ -32,7 +32,6 @@ class TripController extends AbstractController
         $student = $em->getRepository(Student::class)->find($data['student_id']);
         $startingCity = $em->getRepository(City::class)->find($data['starting_trip']);
         $arrivalCity = $em->getRepository(City::class)->find($data['arrival_trip']);
-
 
         if (!$student || !$startingCity || !$arrivalCity) {
             return $this->json([
@@ -47,28 +46,12 @@ class TripController extends AbstractController
             ], 400);
         }
 
-        $seats = $car->getNumberPlaces();
-        if ($data['places_offered'] != $seats - 1) {
-            return $this->json([
-                'error' => 'The number of offered places does not correspond to the number of seats in the car minus one',
-            ], 400);
-        }
-
-        // Dans votre méthode insertTrip
-        $startingCity = $em->getRepository(City::class)->find($data['starting_trip']);
-        $arrivalCity = $em->getRepository(City::class)->find($data['arrival_trip']);
-
-        if (!$startingCity || !$arrivalCity) {
-            return $this->json([
-                'error' => 'City not found',
-            ], 404);
-        }
-
-        if ($startingCity->getId() == $arrivalCity->getId()) {
-            return $this->json([
-                'error' => 'The departure city cannot be the same as the arrival city',
-            ], 400);
-        }
+//        $seats = $car->getNumberPlaces();
+//        if ($data['places_offered'] != $seats - 1) {
+//            return $this->json([
+//                'error' => 'The number of offered places does not correspond to the number of seats in the car minus one',
+//            ], 400);
+//        }
 
         // Check if a trip with the same student, travel date, starting city and arrival city already exists
         try {
@@ -120,6 +103,7 @@ class TripController extends AbstractController
         } catch (Exception $e) {
             $result = "Error while creating the trip: " . $e->getMessage();
         }
+
         // Return the trip data
         return new JsonResponse($result);
     }
@@ -206,48 +190,54 @@ class TripController extends AbstractController
     }
 
     // This routes refer to the association table between the trip and the student
-    #[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
-    public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
-    {
+#[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
+public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
 
-        $data = json_decode($request->getContent(), true);
-        // Check if all necessary fields are present and not empty
-        if (empty($data['trip_id']) || empty($data['student_id'])) {
-            return $this->json([
-                'error' => 'Missing one or more required fields',
-            ], 400);
-        }
-
-        // Get the Trip and Student entities from the database
-        $trip = $em->getRepository(Trip::class)->find($data['trip_id']);
-        $student = $em->getRepository(Student::class)->find($data['student_id']);
-
-        if (!$trip || !$student) {
-            return $this->json([
-                'error' => 'Trip or Student not found',
-            ], 404);
-        }
-
-        // Check if the student is already participating in the trip
-        if ($trip->getStudents()->contains($student)) {
-            return $this->json([
-                'error' => 'The student is already participating in the trip',
-            ], 400);
-        }
-
-        // Add the student to the trip
-        $trip->addStudent($student);
-
-        // Save the new participation
-        $em->persist($trip);
-        $em->flush();
-
-        // Return a success message
+    // Check if all necessary fields are present and not empty
+    if (empty($data['trip_id']) || empty($data['student_id'])) {
         return $this->json([
-            'message' => 'Participation added successfully',
-        ]);
+            'error' => 'Missing one or more required fields',
+        ], 400);
     }
 
+    // Get the Trip and Student entities from the database
+    $trip = $em->getRepository(Trip::class)->find($data['trip_id']);
+    $student = $em->getRepository(Student::class)->find($data['student_id']);
+
+    if (!$trip || !$student) {
+        return $this->json([
+            'error' => 'Trip or Student not found',
+        ], 404);
+    }
+
+    // Check if the trip is already full
+    if (count($trip->getStudents()) > $trip->getPlacesOffered()) {
+        return $this->json([
+            'error' => 'The trip is already full',
+        ], 400);
+    }
+
+    // Check if the student is already participating in the trip
+    if ($trip->getStudents()->contains($student)) {
+        return $this->json([
+            'error' => 'The student is already participating in the trip',
+        ], 400);
+    }
+
+    // Add the student to the trip
+    $trip->addStudent($student);
+
+    // Save the new participation
+    $em->persist($trip);
+    $em->flush();
+
+    // Return a success message
+    return $this->json([
+        'message' => 'Participation added successfully',
+    ]);
+}
     #[Route('/listallparticipations', name: 'app_trip_list_participation', methods: ['GET'])]
     public function listAllParticipations(Request $request, EntityManagerInterface $em): JsonResponse
     {
