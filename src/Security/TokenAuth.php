@@ -88,16 +88,6 @@ class TokenAuth extends AbstractAuthenticator implements AuthenticationEntryPoin
         return $user;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function checkAdminRole(): void
-    {
-
-        if (!$this->security->isGranted('ROLE_ADMIN')) {
-            throw new Exception('Access denied');
-        }
-    }
 
     /**
      * Called on every request to decide if the authenticator should be

@@ -7,7 +7,6 @@ use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\User;
-use App\Security\AdminRoleChecker;
 use App\Security\TokenAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +20,7 @@ class StudentController extends AbstractController
     private TokenAuth $tokenAuth;
 
     // Add the TokenAuth to the constructor to get the user from the token
-    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
+    public function __construct(TokenAuth $tokenAuth)
     {
         $this->tokenAuth = $tokenAuth;
     }
