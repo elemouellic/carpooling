@@ -30,10 +30,10 @@ class UserController extends AbstractController
         // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
-        // Check if all necessary fields are present and not empty
-        if (!isset($data['login']) || !isset($data['password'])) {
+        // Check if all necessary fields are present and not empty and if the login and password are at least 8 characters long
+        if (!isset($data['login']) || !isset($data['password']) || $data['login'] === '' || $data['password'] === '' || strlen($data['login']) < 8 || strlen($data['password']) < 8) {
             return $this->json([
-                'error' => 'Missing login or password',
+                'error' => 'Login and password must be at least 8 characters long',
             ], 400);
         }
 
