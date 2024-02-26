@@ -21,6 +21,7 @@ class StudentController extends AbstractController
     private TokenAuth $tokenAuth;
     private AdminRoleChecker $adminRoleChecker;
 
+    // Add the TokenAuth to the constructor to get the user from the token
     public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
     {
         $this->tokenAuth = $tokenAuth;
@@ -118,12 +119,7 @@ class StudentController extends AbstractController
     #[Route('/updatestudent', name: 'app_student_update', methods: ['PUT'])]
     public function updateStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
+
 
         // Get the request data
         $data = json_decode($request->getContent(), true);
@@ -231,12 +227,6 @@ class StudentController extends AbstractController
     public function getStudent(int $id, EntityManagerInterface $em, Request $request): JsonResponse
     {
 
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // Get the student from the database using the id
         $student = $em->getRepository(Student::class)->find($id);

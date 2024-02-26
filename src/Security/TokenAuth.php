@@ -17,8 +17,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-class TokenAuth extends AbstractAuthenticator
+class TokenAuth extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
 
     private EntityManagerInterface $em;
@@ -31,6 +32,12 @@ class TokenAuth extends AbstractAuthenticator
         $this->tokenUserProvider = $tokenUserProvider;
         $this->security = $security;
 
+    }
+
+    public function start(Request $request, AuthenticationException $authException = null): Response
+    {
+        $content = ['error' => 'Authentication Required'];
+        return new Response(json_encode($content), Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -120,6 +127,8 @@ class TokenAuth extends AbstractAuthenticator
         ];
         return new JsonResponse($data, Response::HTTP_FORBIDDEN);
     }
+
+
 }
 
 {

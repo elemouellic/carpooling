@@ -17,24 +17,18 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class BrandController extends AbstractController
 {
-    private TokenAuth $tokenAuth;
+
     private AdminRoleChecker $adminRoleChecker;
 
-    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
+    public function __construct( AdminRoleChecker $adminRoleChecker)
     {
-        $this->tokenAuth = $tokenAuth;
+
         $this->adminRoleChecker = $adminRoleChecker;
     }
 
     #[Route('/insertbrand', name: 'app_brand_insert', methods: ['POST'])]
     public function insertBrand(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         $data = json_decode($request->getContent(), true);
 
@@ -82,13 +76,6 @@ class BrandController extends AbstractController
             return $response;
         }
 
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // Get the brand from the database
         $brand = $em->getRepository(Brand::class)->find($id);

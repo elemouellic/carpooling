@@ -19,24 +19,16 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class TripController extends AbstractController
 {
-    private TokenAuth $tokenAuth;
     private AdminRoleChecker $adminRoleChecker;
 
-    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
+    public function __construct( AdminRoleChecker $adminRoleChecker)
     {
-        $this->tokenAuth = $tokenAuth;
         $this->adminRoleChecker = $adminRoleChecker;
     }
 
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         $data = json_decode($request->getContent(), true);
         // Check if all necessary fields are present and not empty
@@ -145,13 +137,6 @@ class TripController extends AbstractController
     #[Route('/searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
     public function searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
-
         // Convert the date string to a DateTime object
         try {
             $dateTravel = new \DateTime($dateTravel);
@@ -246,12 +231,6 @@ class TripController extends AbstractController
     #[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
     public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         $data = json_decode($request->getContent(), true);
         // Check if all necessary fields are present and not empty
@@ -338,12 +317,6 @@ class TripController extends AbstractController
     #[Route('/deleteparticipation/{tripid}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
     public function deleteParticipation(Request $request, int $tripid, EntityManagerInterface $em): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // Get the trip from the database using the id
         $trip = $em->getRepository(Trip::class)->find($tripid);
@@ -378,12 +351,6 @@ class TripController extends AbstractController
     #[Route('/getdriverontrip/{tripid}', name: 'app_trip_get_driver', methods: ['GET'])]
     public function getDriverOnTrip(Request $request, EntityManagerInterface $em, $tripid): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // Get the trip from the database using the id
         $trip = $em->getRepository(Trip::class)->find($tripid);
@@ -413,12 +380,6 @@ class TripController extends AbstractController
     #[Route('/getstudentontrips/{studentid}', name: 'app_trip_get_student', methods: ['GET'])]
     public function getStudentOnTrips(Request $request, EntityManagerInterface $em, $studentid): JsonResponse
     {
-        try {
-            $token = $request->headers->get('X-AUTH-TOKEN');
-            $user = $this->tokenAuth->getUserFromToken($token);
-        } catch (CustomUserMessageAuthenticationException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // Get the student from the database using the id
         $student = $em->getRepository(Student::class)->find($studentid);
