@@ -1,0 +1,163 @@
+nelmio_api_doc:
+  documentation:
+    info:
+      title: Carpooling
+      description: This is an awesome carpooling app!
+      version: 1.0.0
+    paths:
+      # Brand routes
+      /insertbrand:
+        post:
+          tags:
+            - Brand
+          summary: Insert brand
+          operationId: app_brand_insert
+          requestBody:
+            description: Brand to insert
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    car_brand:
+                      type: string
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /deletebrand/{id}:
+        delete:
+          tags:
+            - Brand
+          summary: Delete brand
+          operationId: app_brand_delete
+          parameters:
+            - name: id
+              in: path
+              description: ID of the brand to delete
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listallbrands:
+        get:
+          tags:
+            - Brand
+          summary: List all brands
+          operationId: app_brand_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      # Car routes
+      /insertcar:
+        post:
+          tags:
+            - Car
+          summary: Insert car
+          operationId: app_car_insert
+          requestBody:
+            description: Car to insert
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    car_model:
+                      type: string
+                    matriculation:
+                      type: string
+                    number_places:
+                      type: integer
+                    brand:
+                      type: string
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /deletecar/{id}:
+        delete:
+          tags:
+            - Car
+          summary: Delete car
+          operationId: app_car_delete
+          parameters:
+            - name: id
+              in: path
+              description: ID of the car to delete
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listallcars:
+        get:
+          tags:
+            - Car
+          summary: List all cars
+          operationId: app_car_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      # City routes
+      /insertcity:
+        post:
+          tags:
+            - City
+          summary: Insert city
+          operationId: app_city_insert
+          requestBody:
+            description: City to insert
+            required: true
+            content:
+              application/json:
+                schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  zip_code:
+                    type: string
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+
+      # Add the rest of your routes here in a similar fashion
+  areas: # to filter documented areas
+    path_patterns:
+      - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
