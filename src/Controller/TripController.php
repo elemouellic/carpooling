@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\Trip;
+use App\Security\AdminRoleChecker;
 use App\Security\TokenAuth;
 use App\Security\TokenUserProvider;
 use DateTime;
@@ -19,10 +20,12 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 class TripController extends AbstractController
 {
     private TokenAuth $tokenAuth;
+    private AdminRoleChecker $adminRoleChecker;
 
-    public function __construct(TokenAuth $tokenAuth)
+    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
     {
         $this->tokenAuth = $tokenAuth;
+        $this->adminRoleChecker = $adminRoleChecker;
     }
 
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
@@ -184,11 +187,11 @@ class TripController extends AbstractController
     public function listAllTrips(Request $request, EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
+
 
         // Get the trip from the database
         $trips = $em->getRepository(Trip::class)->findAll();
@@ -213,19 +216,11 @@ class TripController extends AbstractController
     public function deleteTrip(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
 
         // Get the trip from the database using the id
         $trip = $em->getRepository(Trip::class)->find($id);
@@ -300,11 +295,11 @@ class TripController extends AbstractController
     public function listAllParticipations(Request $request, EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
+
 
         // Get the participations from the database
         $participations = $em->getRepository(Trip::class)->createQueryBuilder('t')

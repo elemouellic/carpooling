@@ -81,11 +81,14 @@ class TokenAuth extends AbstractAuthenticator
         return $user;
     }
 
+    /**
+     * @throws Exception
+     */
     public function checkAdminRole(): void
     {
 
         if (!$this->security->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException('Access denied');
+            throw new Exception('Access denied');
         }
     }
 

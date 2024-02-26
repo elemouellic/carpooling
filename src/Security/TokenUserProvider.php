@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -65,14 +66,14 @@ class TokenUserProvider implements UserProviderInterface
      * Loads the user for the given identifier.
      * @param string $identifier The user identifier
      * @return UserInterface The user
-     * @throws Exception If the user is not found
+     * @throws CustomUserMessageAuthenticationException If the user is not found
      */
 public function loadUserByIdentifier(string $identifier): UserInterface
 {
     $user = $this->em->getRepository(User::class)->findOneBy(['token' => $identifier]);
 
     if (!$user) {
-        throw new Exception('User not found');
+        throw new CustomUserMessageAuthenticationException('User not found');
     }
 
     return $user;

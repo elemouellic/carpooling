@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\City;
+use App\Security\AdminRoleChecker;
 use App\Security\TokenAuth;
 use App\Security\TokenUserProvider;
 use Doctrine\DBAL\Exception;
@@ -15,19 +16,13 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class CityController extends AbstractController
 {
-//    #[Route('/city', name: 'app_city')]
-//    public function index(): JsonResponse
-//    {
-//        return $this->json([
-//            'message' => 'Welcome to your new controller!',
-//            'path' => 'src/Controller/CityController.php',
-//        ]);
-//    }
     private TokenAuth $tokenAuth;
+    private AdminRoleChecker $adminRoleChecker;
 
-    public function __construct(TokenAuth $tokenAuth)
+    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
     {
         $this->tokenAuth = $tokenAuth;
+        $this->adminRoleChecker = $adminRoleChecker;
     }
 
 
@@ -90,10 +85,9 @@ class CityController extends AbstractController
     public function deleteCity(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
         // Get the city from the database
@@ -121,10 +115,9 @@ class CityController extends AbstractController
     public function listAllCities(EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
 
@@ -149,10 +142,9 @@ class CityController extends AbstractController
     public function listAllZipCodes(EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
 

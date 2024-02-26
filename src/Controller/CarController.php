@@ -6,6 +6,7 @@ use App\Entity\Brand;
 use App\Entity\Car;
 use App\Entity\Student;
 use App\Entity\User;
+use App\Security\AdminRoleChecker;
 use App\Security\TokenAuth;
 use App\Security\TokenUserProvider;
 use Doctrine\DBAL\Exception;
@@ -15,16 +16,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class CarController extends AbstractController
 {
 
     private TokenAuth $tokenAuth;
+    private AdminRoleChecker $adminRoleChecker;
 
-    public function __construct(TokenAuth $tokenAuth)
+    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
     {
         $this->tokenAuth = $tokenAuth;
+        $this->adminRoleChecker = $adminRoleChecker;
     }
 
 
@@ -102,19 +106,11 @@ class CarController extends AbstractController
     public function deleteCar(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-        try {
-            $user = $this->tokenUserProvider->loadUserByIdentifier($token);
-        } catch (Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
         // Get the car from the database using the id
         $car = $em->getRepository(Car::class)->find($id);
 
@@ -139,10 +135,9 @@ class CarController extends AbstractController
     public function listAllCars(EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
 

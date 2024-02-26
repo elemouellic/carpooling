@@ -7,18 +7,35 @@ use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\User;
+use App\Security\AdminRoleChecker;
+use App\Security\TokenAuth;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class StudentController extends AbstractController
 {
+    private TokenAuth $tokenAuth;
+    private AdminRoleChecker $adminRoleChecker;
 
+    public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
+    {
+        $this->tokenAuth = $tokenAuth;
+        $this->adminRoleChecker = $adminRoleChecker;
+    }
     #[Route('/insertstudent', name: 'app_student_insert', methods: ['POST'])]
     public function insertStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        try {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
         // Get the request data
         $data = json_decode($request->getContent(), true);
 
@@ -29,23 +46,13 @@ class StudentController extends AbstractController
             ], 400);
         }
 
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-
-        // Get the user from the database using the token
-        $user = $em->getRepository(User::class)->findOneBy(['token' => $token]);
-
-        // If the user is not found, return an error
-        if (!$user) {
-            return $this->json([
-                'error' => 'Invalid token',
-            ], 401);
-        }
 
         // Create a new Student entity and set the user as the register
         $student = $em->getRepository(Student::class)->findOneBy(['register' => $user]);
         if (!$student) {
             $student = new Student();
+            // Provide the student with the UserInterface instead of User entity
+            // It works because User entity implements UserInterface
             $student->setRegister($user);
         }
 
@@ -182,10 +189,9 @@ class StudentController extends AbstractController
     public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
         // Get the student from the database using the id
@@ -267,10 +273,9 @@ class StudentController extends AbstractController
     public function listAllStudents(EntityManagerInterface $em): JsonResponse
     {
         // Check if the current user has the 'ROLE_ADMIN' role
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
+        $response = $this->adminRoleChecker->checkAdminRole();
+        if ($response) {
+            return $response;
         }
 
         // Get all students from the database
