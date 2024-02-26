@@ -156,6 +156,398 @@ nelmio_api_doc:
               schema:
                 type: string
                 format: password
+      /deletecity/{id}:
+        delete:
+          tags:
+            - City
+          summary: Delete city
+          operationId: app_city_delete
+          parameters:
+            - name: id
+              in: path
+              description: ID of the city to delete
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listallcities:
+        get:
+          tags:
+            - City
+          summary: List all cities
+          operationId: app_city_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listallzipcodes:
+        get:
+          tags:
+            - City
+          summary: List all zip codes
+          operationId: app_zip_code_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      # Student routes
+      /insertstudent:
+        post:
+          tags:
+            - Student
+          summary: Insert student
+          operationId: app_student_insert
+          requestBody:
+            description: Student to insert
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    firstname:
+                      type: string
+                    name:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    city:
+                      type: string
+                    zip_code:
+                      type: string
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /deletestudent/{id}:
+        delete:
+          tags:
+            - Student
+          summary: Delete student
+          operationId: app_student_delete
+          parameters:
+            - name: id
+              in: path
+              description: ID of the student to delete
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /updatestudent:
+        put:
+          tags:
+            - Student
+          summary: Update student
+          operationId: app_student_update
+          requestBody:
+            description: Student to update
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    firstname:
+                      type: string
+                    name:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    city:
+                      type: string
+                    zip_code:
+                      type: string
+                    idstudent:
+                      type: integer
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /selectstudent/{id}:
+        get:
+          tags:
+            - Student
+          summary: Select student
+          operationId: app_student_select
+          parameters:
+            - name: id
+              in: path
+              description: ID of the student to select
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listallstudents:
+        get:
+          tags:
+            - Student
+          summary: List all students
+          operationId: app_student_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      # Trip routes
+      /inserttrip:
+        post:
+          tags:
+            - Trip
+          summary: Insert trip
+          operationId: app_trip_insert
+          requestBody:
+            description: Trip to insert
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    km_distance:
+                      type: float
+                    student_id:
+                      type: integer
+                    travel_date:
+                      type: string
+                      format: date
+                    starting_trip:
+                      type: integer
+                    arrival_trip:
+                      type: integer
+                    places_offered:
+                      type: integer
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /deletetrip/{id}:
+        delete:
+          tags:
+            - Trip
+          summary: Delete trip
+          operationId: app_trip_delete
+          parameters:
+            - name: id
+              in: path
+              description: ID of the trip to delete
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /deleteparticipation/{id}:
+        delete:
+          tags:
+            - Trip
+          summary: Delete participation
+          operationId: app_participation_delete
+          parameters:
+            - name: id
+              in: path
+              description: ID of the participation to delete
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}:
+        get:
+          tags:
+            - Trip
+          summary: Search trip
+          operationId: app_trip_search
+          parameters:
+            - name: idCityStart
+              in: path
+              description: ID of the city of departure
+              required: true
+              schema:
+                type: integer
+            - name: idCityArrival
+              in: path
+              description: ID of the city of arrival
+              required: true
+              schema:
+                type: integer
+            - name: dateTravel
+              in: path
+              description: Date of travel
+              required: true
+              schema:
+                type: string
+                format: date
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listalltrips:
+        get:
+          tags:
+            - Trip
+          summary: List all trips
+          operationId: app_trip_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /listallparticipations:
+        get:
+          tags:
+            - Trip
+          summary: List all participations
+          operationId: app_participation_list
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /getstudentontrips/{id}:
+        get:
+          tags:
+            - Trip
+          summary: Get student on trips
+          operationId: app_student_on_trip
+          parameters:
+            - name: id
+              in: path
+              description: ID of the student
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      /getdriverontrip/{id}:
+        get:
+          tags:
+            - Trip
+          summary: Get driver on trip
+          operationId: app_driver_on_trip
+          parameters:
+            - name: id
+              in: path
+              description: ID of the driver
+              required: true
+              schema:
+                type: integer
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
+      #User routes
+      /register:
+        post:
+          tags:
+            - User
+          summary: Register user
+          operationId: app_user_register
+          requestBody:
+            description: User to register
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    login:
+                      type: string
+                    password:
+                      type: string
+
+      /login:
+        post:
+          tags:
+            - User
+          summary: Login user
+          operationId: app_user_login
+          requestBody:
+            description: User to login
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    login:
+                      type: string
+                    password:
+                      type: string
+
+
 
       # Add the rest of your routes here in a similar fashion
   areas: # to filter documented areas
