@@ -367,6 +367,32 @@ nelmio_api_doc:
               schema:
                 type: string
                 format: password
+      /insertparticipation:
+        post:
+          tags:
+            - Trip
+          summary: Insert participation
+          operationId: app_participation_insert
+          requestBody:
+            description: Participation to insert
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    trip_id:
+                      type: integer
+                    student_id:
+                      type: integer
+          parameters:
+            - name: X-AUTH-TOKEN
+              in: header
+              description: Token for authorization
+              required: true
+              schema:
+                type: string
+                format: password
       /deletetrip/{id}:
         delete:
           tags:
