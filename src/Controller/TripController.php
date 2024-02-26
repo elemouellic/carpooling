@@ -19,12 +19,7 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class TripController extends AbstractController
 {
-    private AdminRoleChecker $adminRoleChecker;
 
-    public function __construct( AdminRoleChecker $adminRoleChecker)
-    {
-        $this->adminRoleChecker = $adminRoleChecker;
-    }
 
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse
@@ -171,12 +166,6 @@ class TripController extends AbstractController
     #[Route('/listalltrips', name: 'app_trip_list', methods: ['GET'])]
     public function listAllTrips(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
 
         // Get the trip from the database
         $trips = $em->getRepository(Trip::class)->findAll();
@@ -200,12 +189,6 @@ class TripController extends AbstractController
     #[Route('/deletetrip/{id}', name: 'app_trip_delete', methods: ['DELETE'])]
     public function deleteTrip(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
 
         // Get the trip from the database using the id
         $trip = $em->getRepository(Trip::class)->find($id);
@@ -273,12 +256,6 @@ class TripController extends AbstractController
     #[Route('/listallparticipations', name: 'app_trip_list_participation', methods: ['GET'])]
     public function listAllParticipations(Request $request, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
 
         // Get the participations from the database
         $participations = $em->getRepository(Trip::class)->createQueryBuilder('t')

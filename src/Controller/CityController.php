@@ -17,18 +17,10 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 class CityController extends AbstractController
 {
 
-    private AdminRoleChecker $adminRoleChecker;
-
-    public function __construct( AdminRoleChecker $adminRoleChecker)
-    {
-        $this->adminRoleChecker = $adminRoleChecker;
-    }
-
 
     #[Route('/insertcity', name: 'app_city_insert', methods: ['POST'])]
     public function insertCity(Request $request, EntityManagerInterface $em): JsonResponse
     {
-
 
         $data = json_decode($request->getContent(), true);
 
@@ -78,11 +70,6 @@ class CityController extends AbstractController
 #[Route('/deletecity/{id}', name: 'app_city_delete', methods: ['DELETE'])]
     public function deleteCity(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
 
         // Get the city from the database
         $city = $em->getRepository(City::class)->find($id);
@@ -108,12 +95,6 @@ class CityController extends AbstractController
     #[Route('/listallcities', name: 'app_city_list', methods: ['GET'])]
     public function listAllCities(EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
 
         // Get all cities from the database
         $cities = $em->getRepository(City::class)->findAll();
@@ -135,13 +116,6 @@ class CityController extends AbstractController
     #[Route('/listallzipcodes', name: 'app_zipcode_list', methods: ['GET'])]
     public function listAllZipCodes(EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
-
         // Get all cities from the database
         $zipCodes = $em->getRepository(City::class)->findAll();
 

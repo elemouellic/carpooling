@@ -21,6 +21,7 @@ security:
             custom_authenticators:
                 - App\Security\TokenAuth
             entry_point: App\Security\TokenAuth
+
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -37,9 +38,39 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # Brand routes
+        - { path: ^/insertbrand, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/deletebrand, roles: ROLE_ADMIN }
+        - { path: ^/listallbrands, roles: ROLE_ADMIN }
+        # Car routes
+        - { path: ^/insertcar, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/deletecar, roles: ROLE_ADMIN }
+        - { path: ^/listallcars, roles: ROLE_ADMIN }
+        # City routes
+        - { path: ^/insertcity, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/deletecity, roles: ROLE_ADMIN }
+        - { path: ^/listallcities, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/listallzipcodes, roles: IS_FULLY_AUTHENTICATED }
+        # Student routes
+        - { path: ^/insertstudent, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/updatestudent, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/deletestudent, roles: ROLE_ADMIN }
+        - { path: ^/selectstudent, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/listallstudents, roles: ROLE_ADMIN }
+        # Trip routes
+        - { path: ^/inserttrip, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/searchtrip, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/listalltrips, roles: ROLE_ADMIN }
+        - { path: ^/deletetrip, roles: ROLE_ADMIN }
+        - { path: ^/insertparticipation, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/listallparticipations, roles: ROLE_ADMIN }
+        - { path: ^/deleteparticipation, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/getdriverontrip, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/getstudentontrips, roles: IS_FULLY_AUTHENTICATED }
+        # User routes
         - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+
 
 when@test:
     security:

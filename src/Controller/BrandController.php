@@ -18,14 +18,6 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 class BrandController extends AbstractController
 {
 
-    private AdminRoleChecker $adminRoleChecker;
-
-    public function __construct( AdminRoleChecker $adminRoleChecker)
-    {
-
-        $this->adminRoleChecker = $adminRoleChecker;
-    }
-
     #[Route('/insertbrand', name: 'app_brand_insert', methods: ['POST'])]
     public function insertBrand(Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -70,13 +62,6 @@ class BrandController extends AbstractController
     #[Route('/deletebrand/{id}', name: 'app_brand_delete', methods: ['DELETE'])]
     public function deleteBrand(Request $request, $id, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
-
         // Get the brand from the database
         $brand = $em->getRepository(Brand::class)->find($id);
 
@@ -106,12 +91,6 @@ class BrandController extends AbstractController
     #[Route('/listallbrands', name: 'app_brand_list', methods: ['GET'])]
     public function listAllBrands(EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
 
         // Get all brands from the database
         $brands = $em->getRepository(Brand::class)->findAll();

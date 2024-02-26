@@ -23,18 +23,10 @@ class CarController extends AbstractController
 {
 
 
-    private AdminRoleChecker $adminRoleChecker;
-
-    public function __construct(AdminRoleChecker $adminRoleChecker)
-    {
-        $this->adminRoleChecker = $adminRoleChecker;
-    }
-
 
     #[Route('/insertcar', name: 'app_car_insert', methods: ['POST'])]
     public function insertCar(Request $request, EntityManagerInterface $em): JsonResponse
     {
-
 
         $data = json_decode($request->getContent(), true);
 
@@ -99,11 +91,6 @@ class CarController extends AbstractController
     #[Route('/deletecar/{id}', name: 'app_car_delete', methods: ['DELETE'])]
     public function deleteCar(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
 
         // Get the car from the database using the id
         $car = $em->getRepository(Car::class)->find($id);
@@ -128,12 +115,6 @@ class CarController extends AbstractController
     #[Route('/listallcars', name: 'app_car_list', methods: ['GET'])]
     public function listAllCars(EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
-
 
         // Get all cars from the database
         $cars = $em->getRepository(Car::class)->findAll();

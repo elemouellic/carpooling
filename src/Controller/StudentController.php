@@ -19,13 +19,11 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 class StudentController extends AbstractController
 {
     private TokenAuth $tokenAuth;
-    private AdminRoleChecker $adminRoleChecker;
 
     // Add the TokenAuth to the constructor to get the user from the token
     public function __construct(TokenAuth $tokenAuth, AdminRoleChecker $adminRoleChecker)
     {
         $this->tokenAuth = $tokenAuth;
-        $this->adminRoleChecker = $adminRoleChecker;
     }
     #[Route('/insertstudent', name: 'app_student_insert', methods: ['POST'])]
     public function insertStudent(Request $request, EntityManagerInterface $em): JsonResponse
@@ -191,11 +189,7 @@ class StudentController extends AbstractController
     #[Route('/deletestudent/{id}', name: 'app_student_delete', methods: ['DELETE'])]
     public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
+
 
         // Get the student from the database using the id
         $student = $em->getRepository(Student::class)->find($id);
@@ -257,11 +251,6 @@ class StudentController extends AbstractController
     #[Route('/listallstudents', name: 'app_student_list', methods: ['GET'])]
     public function listAllStudents(EntityManagerInterface $em): JsonResponse
     {
-        // Check if the current user has the 'ROLE_ADMIN' role
-        $response = $this->adminRoleChecker->checkAdminRole();
-        if ($response) {
-            return $response;
-        }
 
         // Get all students from the database
         $students = $em->getRepository(Student::class)->findAll();
