@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -62,7 +63,9 @@ class UserController extends AbstractController
                 'user_id' => $user->getId(),
             ];
         } catch (RandomException|Exception $e) {
-            $result = "Error while creating the user: " . $e->getMessage();
+            return new JsonResponse(["error" => "Error while creating the user: " . $e->getMessage()], 400);
+        } catch (UniqueConstraintViolationException $e) {
+            return new JsonResponse(["error" => "Error while creating the user: Login already exists"], 409);
         }
         return new JsonResponse($result);
     }

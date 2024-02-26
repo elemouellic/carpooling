@@ -67,9 +67,9 @@ security:
         - { path: ^/deleteparticipation, roles: ROLE_USER }
         - { path: ^/getdriverontrip, roles: ROLE_USER }
         - { path: ^/getstudentontrips, roles: ROLE_USER }
-        # User routes
-        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#        # User routes
+#        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
 
 when@test:
