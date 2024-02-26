@@ -118,6 +118,13 @@ class StudentController extends AbstractController
     #[Route('/updatestudent', name: 'app_student_update', methods: ['PUT'])]
     public function updateStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        try {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
         // Get the request data
         $data = json_decode($request->getContent(), true);
 
@@ -223,6 +230,14 @@ class StudentController extends AbstractController
     #[Route('/selectstudent/{id}', name: 'app_student_get', methods: ['GET'])]
     public function getStudent(int $id, EntityManagerInterface $em, Request $request): JsonResponse
     {
+
+        try {
+            $token = $request->headers->get('X-AUTH-TOKEN');
+            $user = $this->tokenAuth->getUserFromToken($token);
+        } catch (CustomUserMessageAuthenticationException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 404);
+        }
+
         // Get the student from the database using the id
         $student = $em->getRepository(Student::class)->find($id);
 
@@ -231,26 +246,6 @@ class StudentController extends AbstractController
             return $this->json([
                 'error' => 'Student not found',
             ], 404);
-        }
-
-        // Get the token from the request headers
-        $token = $request->headers->get('X-AUTH-TOKEN');
-
-        // Get the user from the database using the token
-        $user = $em->getRepository(User::class)->findOneBy(['token' => $token]);
-
-        // If the user is not found, return an error
-        if (!$user) {
-            return $this->json([
-                'error' => 'Invalid token',
-            ], 401);
-        }
-
-        // Check if the current user is the same as the student's register
-        if ($user !== $student->getRegister()) {
-            return $this->json([
-                'error' => 'Access denied',
-            ], 403);
         }
 
         // Return the student data
