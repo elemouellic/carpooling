@@ -39,37 +39,37 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # Brand routes
-        - { path: ^/insertbrand, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/insertbrand, roles: ROLE_USER }
         - { path: ^/deletebrand, roles: ROLE_ADMIN }
         - { path: ^/listallbrands, roles: ROLE_ADMIN }
         # Car routes
-        - { path: ^/insertcar, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/insertcar, roles: ROLE_USER }
         - { path: ^/deletecar, roles: ROLE_ADMIN }
         - { path: ^/listallcars, roles: ROLE_ADMIN }
         # City routes
-        - { path: ^/insertcity, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/insertcity, roles: ROLE_USER }
         - { path: ^/deletecity, roles: ROLE_ADMIN }
-        - { path: ^/listallcities, roles: IS_FULLY_AUTHENTICATED }
-        - { path: ^/listallzipcodes, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/listallcities, roles: ROLE_USER }
+        - { path: ^/listallzipcodes, roles: ROLE_USER }
         # Student routes
-        - { path: ^/insertstudent, roles: IS_FULLY_AUTHENTICATED }
-        - { path: ^/updatestudent, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/insertstudent, roles: ROLE_USER }
+        - { path: ^/updatestudent, roles: ROLE_USER }
         - { path: ^/deletestudent, roles: ROLE_ADMIN }
-        - { path: ^/selectstudent, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/selectstudent, roles: ROLE_USER }
         - { path: ^/listallstudents, roles: ROLE_ADMIN }
         # Trip routes
-        - { path: ^/inserttrip, roles: IS_FULLY_AUTHENTICATED }
-        - { path: ^/searchtrip, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/inserttrip, roles: ROLE_USER }
+        - { path: ^/searchtrip, roles: ROLE_USER }
         - { path: ^/listalltrips, roles: ROLE_ADMIN }
         - { path: ^/deletetrip, roles: ROLE_ADMIN }
-        - { path: ^/insertparticipation, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/insertparticipation, roles: ROLE_USER }
         - { path: ^/listallparticipations, roles: ROLE_ADMIN }
-        - { path: ^/deleteparticipation, roles: IS_FULLY_AUTHENTICATED }
-        - { path: ^/getdriverontrip, roles: IS_FULLY_AUTHENTICATED }
-        - { path: ^/getstudentontrips, roles: IS_FULLY_AUTHENTICATED }
+        - { path: ^/deleteparticipation, roles: ROLE_USER }
+        - { path: ^/getdriverontrip, roles: ROLE_USER }
+        - { path: ^/getstudentontrips, roles: ROLE_USER }
         # User routes
-        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, roles: ROLE_USER }
+        - { path: ^/login, roles: ROLE_USER }
 
 
 when@test:
