@@ -27,7 +27,7 @@ sonarqube-vulnerability-report:
   stage: sonarqube-vulnerability-report
   script:
     - pwd
-    - 'curl -i -v -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=Emmanuel_carpooling_16039ef8-dc34-47d2-ae03-6257126526cd&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
+    - 'curl -u "${SONAR_TOKEN}:" "${SONAR_HOST_URL}/api/issues/gitlab_sast_export?projectKey=Emmanuel_carpooling_16039ef8-dc34-47d2-ae03-6257126526cd&branch=${CI_COMMIT_BRANCH}&pullRequest=${CI_MERGE_REQUEST_IID}" -o gl-sast-sonar-report.json'
   allow_failure: true
   only:
     - merge_requests

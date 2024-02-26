@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Entity\Trip;
+use App\Security\TokenAuth;
+use App\Security\Utils;
 use DateTime;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,10 +18,27 @@ use Symfony\Component\Routing\Attribute\Route;
 class TripController extends AbstractController
 {
 
+    private TokenAuth $tokenAuth;
+
+    // Add the TokenAuth to the constructor to get the user from the token
+    public function __construct(TokenAuth $tokenAuth)
+    {
+        $this->tokenAuth = $tokenAuth;
+    }
+
     #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        // Get the request data
         $data = json_decode($request->getContent(), true);
+
+        // Get the student from the database using the idstudent
+        $student = $em->getRepository(Student::class)->find($data['idstudent']);
+
+        $response = Utils::checkUser($this->tokenAuth, $request, $student);
+        if ($response->getStatusCode() !== 200) {
+            return $response;
+        }
 
         // Check if all necessary fields are present and not empty
         if (!isset($data['km_distance']) || !isset($data['student_id']) || !isset($data['travel_date']) || !isset($data['starting_trip']) || !isset($data['arrival_trip']) || !isset($data['places_offered']) || $data['km_distance'] === '' || $data['student_id'] === '' || $data['travel_date'] === '' || $data['starting_trip'] === '' || $data['arrival_trip'] === '' || $data['places_offered'] === '') {
@@ -111,6 +130,7 @@ class TripController extends AbstractController
     #[Route('/searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
     public function searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel): JsonResponse
     {
+
         // Convert the date string to a DateTime object
         try {
             $dateTravel = new \DateTime($dateTravel);
@@ -190,54 +210,64 @@ class TripController extends AbstractController
     }
 
     // This routes refer to the association table between the trip and the student
-#[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
-public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
-{
-    $data = json_decode($request->getContent(), true);
+    #[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
+    public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        // Get the request data
+        $data = json_decode($request->getContent(), true);
 
-    // Check if all necessary fields are present and not empty
-    if (empty($data['trip_id']) || empty($data['student_id'])) {
+        // Get the student from the database using the idstudent
+        $student = $em->getRepository(Student::class)->find($data['idstudent']);
+
+        $response = Utils::checkUser($this->tokenAuth, $request, $student);
+        if ($response->getStatusCode() !== 200) {
+            return $response;
+        }
+
+        // Check if all necessary fields are present and not empty
+        if (empty($data['trip_id']) || empty($data['student_id'])) {
+            return $this->json([
+                'error' => 'Missing one or more required fields',
+            ], 400);
+        }
+
+        // Get the Trip and Student entities from the database
+        $trip = $em->getRepository(Trip::class)->find($data['trip_id']);
+        $student = $em->getRepository(Student::class)->find($data['student_id']);
+
+        if (!$trip || !$student) {
+            return $this->json([
+                'error' => 'Trip or Student not found',
+            ], 404);
+        }
+
+        // Check if the trip is already full
+        if (count($trip->getStudents()) > $trip->getPlacesOffered()) {
+            return $this->json([
+                'error' => 'The trip is already full',
+            ], 400);
+        }
+
+        // Check if the student is already participating in the trip
+        if ($trip->getStudents()->contains($student)) {
+            return $this->json([
+                'error' => 'The student is already participating in the trip',
+            ], 400);
+        }
+
+        // Add the student to the trip
+        $trip->addStudent($student);
+
+        // Save the new participation
+        $em->persist($trip);
+        $em->flush();
+
+        // Return a success message
         return $this->json([
-            'error' => 'Missing one or more required fields',
-        ], 400);
+            'message' => 'Participation added successfully',
+        ]);
     }
 
-    // Get the Trip and Student entities from the database
-    $trip = $em->getRepository(Trip::class)->find($data['trip_id']);
-    $student = $em->getRepository(Student::class)->find($data['student_id']);
-
-    if (!$trip || !$student) {
-        return $this->json([
-            'error' => 'Trip or Student not found',
-        ], 404);
-    }
-
-    // Check if the trip is already full
-    if (count($trip->getStudents()) > $trip->getPlacesOffered()) {
-        return $this->json([
-            'error' => 'The trip is already full',
-        ], 400);
-    }
-
-    // Check if the student is already participating in the trip
-    if ($trip->getStudents()->contains($student)) {
-        return $this->json([
-            'error' => 'The student is already participating in the trip',
-        ], 400);
-    }
-
-    // Add the student to the trip
-    $trip->addStudent($student);
-
-    // Save the new participation
-    $em->persist($trip);
-    $em->flush();
-
-    // Return a success message
-    return $this->json([
-        'message' => 'Participation added successfully',
-    ]);
-}
     #[Route('/listallparticipations', name: 'app_trip_list_participation', methods: ['GET'])]
     public function listAllParticipations(Request $request, EntityManagerInterface $em): JsonResponse
     {

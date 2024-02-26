@@ -89,6 +89,7 @@ class TokenAuth extends AbstractAuthenticator implements AuthenticationEntryPoin
     }
 
 
+
     /**
      * Called on every request to decide if the authenticator should be
      * used for this request. Returning false will cause this authenticator

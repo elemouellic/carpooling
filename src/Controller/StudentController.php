@@ -7,6 +7,7 @@ use App\Entity\Car;
 use App\Entity\City;
 use App\Entity\Student;
 use App\Security\TokenAuth;
+use App\Security\Utils;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +24,7 @@ class StudentController extends AbstractController
     {
         $this->tokenAuth = $tokenAuth;
     }
+
     #[Route('/insertstudent', name: 'app_student_insert', methods: ['POST'])]
     public function insertStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -115,9 +117,17 @@ class StudentController extends AbstractController
     #[Route('/updatestudent', name: 'app_student_update', methods: ['PUT'])]
     public function updateStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
-
         // Get the request data
         $data = json_decode($request->getContent(), true);
+
+        // Get the student from the database using the idstudent
+        $student = $em->getRepository(Student::class)->find($data['idstudent']);
+
+        $response = Utils::checkUser($this->tokenAuth, $request, $student);
+        if ($response->getStatusCode() !== 200) {
+            return $response;
+        }
+
 
         // Check if all necessary fields are present and not empty
         if (empty($data['firstname']) || empty($data['name']) || empty($data['phone']) || empty($data['email']) || empty($data['idstudent'])) {
@@ -126,8 +136,6 @@ class StudentController extends AbstractController
             ], 400);
         }
 
-        // Get the student from the database using the idstudent
-        $student = $em->getRepository(Student::class)->find($data['idstudent']);
 
         // If the student is not found, return an error
         if (!$student) {
@@ -135,6 +143,7 @@ class StudentController extends AbstractController
                 'error' => 'Student not found',
             ], 404);
         }
+
 
         // Update the student entity with the request data
         $student->setFirstname($data['firstname']);
