@@ -68,8 +68,8 @@ security:
         - { path: ^/getdriverontrip, roles: ROLE_USER }
         - { path: ^/getstudentontrips, roles: ROLE_USER }
         # User routes
-        - { path: ^/register, roles: ROLE_USER }
-        - { path: ^/login, roles: ROLE_USER }
+        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
 
 when@test:
