@@ -40,4 +40,3 @@ sonarqube-vulnerability-report:
       sast: gl-sast-sonar-report.json
   dependencies:
     - sonarqube-check
-
