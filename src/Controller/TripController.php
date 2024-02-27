@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class TripController extends AbstractController
 {
 
+    private const TRIP_NOT_FOUND = 'Trip not found';
     private TokenAuth $tokenAuth;
 
     // Add the TokenAuth to the constructor to get the user from the token
@@ -195,7 +196,7 @@ class TripController extends AbstractController
         // If the trip is not found, return an error
         if (!$trip) {
             return $this->json([
-                'error' => 'Trip not found',
+                'error' => self::TRIP_NOT_FOUND,
             ], 404);
         }
 
@@ -316,7 +317,7 @@ class TripController extends AbstractController
         // If the trip is not found, return an error
         if (!$trip) {
             return $this->json([
-                'error' => 'Trip not found',
+                'error' => self::TRIP_NOT_FOUND,
             ], 404);
         }
 
@@ -350,7 +351,7 @@ class TripController extends AbstractController
         // If the trip is not found, return an error
         if (!$trip) {
             return $this->json([
-                'error' => 'Trip not found',
+                'error' => self::TRIP_NOT_FOUND,
             ], 404);
         }
 
