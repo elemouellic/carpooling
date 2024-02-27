@@ -1,0 +1,75 @@
+@startuml
+
+
+class Brand {
+    -id: int
+    -carBrand: string
+    -cars: Collection<Car>
+}
+
+class Car {
+    -id: int
+    -carModel: string
+    -matriculation: string
+    -identify: Brand
+    -numberPlaces: int
+}
+
+class City {
+    -id: int
+    -name: string
+    -zipCode: string
+    -trips: Collection<Trip>
+    -tripsArrival: Collection<Trip>
+    -students: Collection<Student>
+}
+
+class Student {
+    -id: int
+    -firstname: string
+    -name: string
+    -phone: string
+    -email: string
+    -register: User
+    -participate: Collection<Trip>
+    -drive: Collection<Trip>
+    -live: City
+    -possess: Car
+}
+
+class Trip {
+    -id: int
+    -kmDistance: float
+    -travelDate: DateTime
+    -placesOffered: int
+    -students: Collection<Student>
+    -student: Student
+    -startingTrip: City
+    -arrivalTrip: City
+}
+
+class User {
+    -id: int
+    -login: string
+    -roles: array
+    -password: string
+    -token: string
+}
+Student "0.1" -- "1" User : register
+
+Student "many" -- "many" Trip : participate
+Student "1" -- "many" Trip : drive
+Car "0.1" -- "1" Student : possess
+City "1" -- "many" Student : live
+
+Brand "1" -- "many" Car : identify
+
+City "1" -- "many" Trip : starting
+City "1" -- "many" Trip : arrival
+
+
+
+
+
+
+@enduml
