@@ -1,10 +1,14 @@
 @startuml
 
+left to right direction
 
 class Brand {
     -id: int
     -carBrand: string
     -cars: Collection<Car>
+   +insertBrand() : JsonResponse
+   +deleteBrand() : JsonResponse
+   +listAllBrands() : JsonResponse
 }
 
 class Car {
@@ -13,6 +17,9 @@ class Car {
     -matriculation: string
     -identify: Brand
     -numberPlaces: int
+    +insertCar() : JsonResponse
+    +deleteCar() : JsonResponse
+    +listAllCars() : JsonResponse
 }
 
 class City {
@@ -22,6 +29,10 @@ class City {
     -trips: Collection<Trip>
     -tripsArrival: Collection<Trip>
     -students: Collection<Student>
+    +insertCity() : JsonResponse
+    +deleteCity() : JsonResponse
+    +listAllCities() : JsonResponse
+    +listAllZipCodes() : JsonResponse
 }
 
 class Student {
@@ -35,6 +46,11 @@ class Student {
     -drive: Collection<Trip>
     -live: City
     -possess: Car
+    +insertStudent() : JsonResponse
+    +updateStudent() : JsonResponse
+    +deleteStudent() : JsonResponse
+    +getStudent() : JsonResponse
+    +listAllStudents() : JsonResponse
 }
 
 class Trip {
@@ -46,6 +62,15 @@ class Trip {
     -student: Student
     -startingTrip: City
     -arrivalTrip: City
+    +insertTrip() : JsonResponse
+    +searchTrip() : JsonResponse
+    +listAllTrips() : JsonResponse
+    +deleteTrip() : JsonResponse
+    +insertParticipation() : JsonResponse
+    +listAllParticipations() : JsonResponse
+    +deleteParticipation() : JsonResponse
+    +getDriverOnTrip() : JsonResponse
+    +getStudentOnTrips() : JsonResponse
 }
 
 class User {
@@ -54,18 +79,23 @@ class User {
     -roles: array
     -password: string
     -token: string
+    +register() : JsonResponse
+    +login() : JsonResponse
 }
+
+
+
 Student "0.1" -- "1" User : register
 
-Student "many" -- "many" Trip : participate
-Student "1" -- "many" Trip : drive
+Student "*" -- "*" Trip : participate
+Student "1" -- "*" Trip : drive
 Car "0.1" -- "1" Student : possess
-City "1" -- "many" Student : live
+City "1" -- "*" Student : live
 
-Brand "1" -- "many" Car : identify
+Brand "1" -- "*" Car : identify
 
-City "1" -- "many" Trip : starting
-City "1" -- "many" Trip : arrival
+City "1" -- "*" Trip : starting
+City "1" -- "*" Trip : arrival
 
 
 
