@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class StudentController extends AbstractController
 {
+    private const STUDENT_NOT_FOUND = 'Student not found';
     private TokenAuth $tokenAuth;
 
     // Add the TokenAuth to the constructor to get the user from the token
@@ -131,7 +132,7 @@ class StudentController extends AbstractController
         } else if (empty($data['firstname']) || empty($data['name']) || empty($data['phone']) || empty($data['email']) || empty($data['idstudent'])) {
             $response = $this->json(['error' => 'Missing one or more required fields'], 400);
         } else if (!$student) {
-            $response = $this->json(['error' => 'Student not found'], 404);
+            $response = $this->json(['error' => self::STUDENT_NOT_FOUND], 404);
         } else {
             // Update the student entity with the request data
             $student->setFirstname($data['firstname']);
@@ -189,7 +190,7 @@ class StudentController extends AbstractController
         // If the student is not found, return an error
         if (!$student) {
             return $this->json([
-                'error' => 'Student not found',
+                'error' => self::STUDENT_NOT_FOUND,
             ], 404);
         }
 
@@ -219,7 +220,7 @@ class StudentController extends AbstractController
         // If the student is not found, return an error
         if (!$student) {
             return $this->json([
-                'error' => 'Student not found',
+                'error' => self::STUDENT_NOT_FOUND,
             ], 404);
         }
 
