@@ -2,14 +2,13 @@
 skinparam linetype polyline
 left to right direction
 
-title Architecture en Couches
 
 
 
 
 package "Carpooling Model" as model{
 class User {
-    -login: string {unique}
+    -login: string
     -roles: array
     -password: string
     -token: string

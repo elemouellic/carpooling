@@ -1,6 +1,6 @@
 @startuml
 skinparam linetype ortho
-left to right direction
+top to bottom direction
 
 title Architecture en Couches
 
