@@ -1,105 +1,127 @@
 @startuml
+skinparam linetype ortho
 
-left to right direction
+title Architecture en Couches
+top to bottom direction
 
-class Brand {
-    -id: int
-    -carBrand: string
-    -cars: Collection<Car>
-   +insertBrand() : JsonResponse
-   +deleteBrand() : JsonResponse
-   +listAllBrands() : JsonResponse
+package "Carpooling Controller" << BUSINESS LOGIC >> as controller {
+abstract class AbstractController  {
 }
-
-class Car {
-    -id: int
-    -carModel: string
-    -matriculation: string
-    -identify: Brand
-    -numberPlaces: int
-    +insertCar() : JsonResponse
-    +deleteCar() : JsonResponse
-    +listAllCars() : JsonResponse
+class BrandController {
+    +createBrand()
+    +updateBrand()
+    +deleteBrand()
+    +getBrand()
+    +getBrands()
 }
-
-class City {
-    -id: int
-    -name: string
-    -zipCode: string
-    -trips: Collection<Trip>
-    -tripsArrival: Collection<Trip>
-    -students: Collection<Student>
-    +insertCity() : JsonResponse
-    +deleteCity() : JsonResponse
-    +listAllCities() : JsonResponse
-    +listAllZipCodes() : JsonResponse
+class CarController {
+    +createCar()
+    +updateCar()
+    +deleteCar()
+    +getCar()
+    +getCars()
 }
-
-class Student {
-    -id: int
-    -firstname: string
-    -name: string
-    -phone: string
-    -email: string
-    -register: User
-    -participate: Collection<Trip>
-    -drive: Collection<Trip>
-    -live: City
-    -possess: Car
-    +insertStudent() : JsonResponse
-    +updateStudent() : JsonResponse
-    +deleteStudent() : JsonResponse
-    +getStudent() : JsonResponse
-    +listAllStudents() : JsonResponse
+class CityController {
+    +createCity()
+    +updateCity()
+    +deleteCity()
+    +getCity()
+    +getCities()
 }
-
-class Trip {
-    -id: int
-    -kmDistance: float
-    -travelDate: DateTime
-    -placesOffered: int
-    -students: Collection<Student>
-    -student: Student
-    -startingTrip: City
-    -arrivalTrip: City
-    +insertTrip() : JsonResponse
-    +searchTrip() : JsonResponse
-    +listAllTrips() : JsonResponse
-    +deleteTrip() : JsonResponse
-    +insertParticipation() : JsonResponse
-    +listAllParticipations() : JsonResponse
-    +deleteParticipation() : JsonResponse
-    +getDriverOnTrip() : JsonResponse
-    +getStudentOnTrips() : JsonResponse
+class StudentController {
+    +createStudent()
+    +updateStudent()
+    +deleteStudent()
+    +getStudent()
+    +getStudents()
 }
+class TripController {
+    +createTrip()
+    +updateTrip()
+    +deleteTrip()
+    +getTrip()
+    +getTrips()
+}
+class UserController {
+    +createUser()
+    +updateUser()
+    +deleteUser()
+    +getUser()
+    +getUsers()
+}
+AbstractController <|-down- BrandController
+AbstractController <|-down- CarController
+AbstractController <|-down- CityController
+AbstractController <|-down- StudentController
+AbstractController <|-down- TripController
+AbstractController <|-down- UserController
 
-class User {
-    -id: int
-    -login: string
-    -roles: array
-    -password: string
-    -token: string
-    +register() : JsonResponse
-    +login() : JsonResponse
 }
 
 
+package "Carpooling Model" <<CRUD OPERATIONS>> as model{
+  class Brand {
+      -id: int
+      -carBrand: string
+      -cars: Collection<Car>
+  }
+ class Car {
+     -id: int
+     -carModel: string
+     -matriculation: string
+     -identify: Brand
+     -numberPlaces: int
+ }
+ class City {
+      -id: int
+      -name: string
+      -zipCode: string
+      -trips: Collection<Trip>
+      -tripsArrival: Collection<Trip>
+      -students: Collection<Student>
+  }
+  class Student {
+      -id: int
+      -firstname: string
+      -name: string
+      -phone: string
+      -email: string
+      -register: User
+      -participate: Collection<Trip>
+      -drive: Collection<Trip>
+      -live: City
+      -possess: Car
+  }
+  class Trip {
+      -id: int
+      -kmDistance: float
+      -travelDate: DateTime
+      -placesOffered: int
+      -students: Collection<Student>
+      -student: Student
+      -startingTrip: City
+      -arrivalTrip: City
+  }
+  class User {
+      -id: int
+      -login: string
+      -roles: array
+      -password: string
+      -token: string
+  }
+  Student "0.1" -- "1" User : register
 
-Student "0.1" -- "1" User : register
+  Student "many" -- "many" Trip : participate
+  Student "1" -- "many" Trip : drive
+  Car "0.1" -- "1" Student : possess
+  City "1" -- "many" Student : live
 
-Student "*" -- "*" Trip : participate
-Student "1" -- "*" Trip : drive
-Car "0.1" -- "1" Student : possess
-City "1" -- "*" Student : live
+  Brand "1" -- "many" Car : identify
 
-Brand "1" -- "*" Car : identify
-
-City "1" -- "*" Trip : starting
-City "1" -- "*" Trip : arrival
+  City "1" -- "many" Trip : starting
+  City "1" -- "many" Trip : arrival
 
 
-
-
-
-
+}
+controller --> model
 @enduml
