@@ -1,0 +1,62 @@
+@startuml
+skinparam linetype ortho
+top to bottom direction
+
+title Architecture en Couches
+
+package "Carpooling Controller"  as controller {
+abstract class AbstractController  {
+}
+class BrandController {
+    +createBrand() : Response
+    +updateBrand() : Response
+    +deleteBrand() : Response
+    +getBrand() : Response
+    +getBrands() : Response
+}
+class CarController {
+    +createCar() : Response
+    +updateCar() : Response
+    +deleteCar() : Response
+    +getCar() : Response
+    +getCars() : Response
+}
+class CityController {
+    +createCity() : Response
+    +updateCity() : Response
+    +deleteCity() : Response
+    +getCity() : Response
+    +getCities() : Response
+}
+class StudentController {
+    -tokenAuth : TokenAuth
+    +createStudent() : Response
+    +updateStudent() : Response
+    +deleteStudent() : Response
+    +getStudent() : Response
+    +getStudents() : Response
+}
+class TripController {
+    -tokenAuth : TokenAuth
+    +createTrip() : Response
+    +updateTrip() : Response
+    +deleteTrip() : Response
+    +getTrip() : Response
+    +getTrips() : Response
+}
+class UserController {
+    -passwordHasher : UserPasswordHasherInterface
+    +createUser() : Response
+    +updateUser() : Response
+    +deleteUser() : Response
+    +getUser() : Response
+    +getUsers() : Response
+}
+AbstractController ^-down- BrandController
+AbstractController ^-down- CarController
+AbstractController ^-down- CityController
+AbstractController ^-down- StudentController
+AbstractController ^-down- TripController
+AbstractController ^-down- UserController
+
+@enduml

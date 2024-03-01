@@ -1,8 +1,9 @@
 @startuml
 skinparam linetype ortho
+left to right direction
 
 title Architecture en Couches
-top to bottom direction
+
 
 package "Carpooling Controller" << BUSINESS LOGIC >> as controller {
 abstract class AbstractController  {
@@ -49,37 +50,24 @@ class UserController {
     +getUser()
     +getUsers()
 }
-AbstractController <|-down- BrandController
-AbstractController <|-down- CarController
-AbstractController <|-down- CityController
-AbstractController <|-down- StudentController
-AbstractController <|-down- TripController
-AbstractController <|-down- UserController
+AbstractController ^-down- BrandController
+AbstractController ^-down- CarController
+AbstractController ^-down- CityController
+AbstractController ^-down- StudentController
+AbstractController ^-down- TripController
+AbstractController ^-down- UserController
 
 }
 
 
 package "Carpooling Model" <<CRUD OPERATIONS>> as model{
-  class Brand {
-      -id: int
-      -carBrand: string
-      -cars: Collection<Car>
-  }
- class Car {
-     -id: int
-     -carModel: string
-     -matriculation: string
-     -identify: Brand
-     -numberPlaces: int
- }
- class City {
-      -id: int
-      -name: string
-      -zipCode: string
-      -trips: Collection<Trip>
-      -tripsArrival: Collection<Trip>
-      -students: Collection<Student>
-  }
+   class User {
+       -id: int
+       -login: string
+       -roles: array
+       -password: string
+       -token: string
+   }
   class Student {
       -id: int
       -firstname: string
@@ -92,6 +80,19 @@ package "Carpooling Model" <<CRUD OPERATIONS>> as model{
       -live: City
       -possess: Car
   }
+  class Car {
+      -id: int
+      -carModel: string
+      -matriculation: string
+      -identify: Brand
+      -numberPlaces: int
+  }
+ class Brand {
+       -id: int
+       -carBrand: string
+       -cars: Collection<Car>
+  }
+
   class Trip {
       -id: int
       -kmDistance: float
@@ -102,26 +103,29 @@ package "Carpooling Model" <<CRUD OPERATIONS>> as model{
       -startingTrip: City
       -arrivalTrip: City
   }
-  class User {
-      -id: int
-      -login: string
-      -roles: array
-      -password: string
-      -token: string
-  }
-  Student "0.1" -- "1" User : register
+  class City {
+           -id: int
+           -name: string
+           -zipCode: string
+           -trips: Collection<Trip>
+           -tripsArrival: Collection<Trip>
+           -students: Collection<Student>
+       }
+
+  Student "0.1" - "1" User : register
 
   Student "many" -- "many" Trip : participate
   Student "1" -- "many" Trip : drive
   Car "0.1" -- "1" Student : possess
-  City "1" -- "many" Student : live
+
 
   Brand "1" -- "many" Car : identify
 
   City "1" -- "many" Trip : starting
   City "1" -- "many" Trip : arrival
+  City "1" -- "many" Student : live
 
 
 }
-controller --> model
+controller <.down. model
 @enduml

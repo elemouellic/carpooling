@@ -1,0 +1,77 @@
+@startuml
+skinparam linetype polyline
+left to right direction
+
+title Architecture en Couches
+
+
+
+
+package "Carpooling Model" as model{
+class User {
+    -login: string {unique}
+    -roles: array
+    -password: string
+    -token: string
+}
+  Entity Student {
+      -id: int
+      -firstname: string
+      -name: string
+      -phone: string
+      -email: string
+      -register: User
+      -participate: Collection<Trip>
+      -drive: Collection<Trip>
+      -live: City
+      -possess: Car
+  }
+  Entity Car {
+      -id: int
+      -carModel: string
+      -matriculation: string
+      -identify: Brand
+      -numberPlaces: int
+  }
+ Entity Brand {
+       -id: int
+       -carBrand: string
+       -cars: Collection<Car>
+  }
+
+  Entity Trip {
+      -id: int
+      -kmDistance: float
+      -travelDate: DateTime
+      -placesOffered: int
+      -students: Collection<Student>
+      -student: Student
+      -startingTrip: City
+      -arrivalTrip: City
+  }
+  Entity City {
+           -id: int
+           -name: string
+           -zipCode: string
+           -trips: Collection<Trip>
+           -tripsArrival: Collection<Trip>
+           -students: Collection<Student>
+       }
+
+  Student "0.1" ---o "1" User : register
+
+  Student "*" --- "*" Trip : participate
+  Student "1" <--- "*" Trip : drive
+  Car "0.1" --- "1" Student : possess
+
+
+  Brand "1" ---> "*" Car : identify
+
+  City "1" <--- "*" Trip : starting
+  City "1" <--- "*" Trip : arrival
+  City "1" --- "*" Student : live
+
+
+}
+
+@enduml
