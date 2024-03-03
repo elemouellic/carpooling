@@ -13,7 +13,7 @@ class User {
     -password: string
     -token: string
 }
-  Entity Student {
+  entity Student {
       -id: int
       -firstname: string
       -name: string
@@ -25,20 +25,20 @@ class User {
       -live: City
       -possess: Car
   }
-  Entity Car {
+  entity Car {
       -id: int
       -carModel: string
       -matriculation: string
       -identify: Brand
       -numberPlaces: int
   }
- Entity Brand {
+ entity Brand {
        -id: int
        -carBrand: string
        -cars: Collection<Car>
   }
 
-  Entity Trip {
+  entity Trip {
       -id: int
       -kmDistance: float
       -travelDate: DateTime
@@ -48,7 +48,7 @@ class User {
       -startingTrip: City
       -arrivalTrip: City
   }
-  Entity City {
+  entity City {
            -id: int
            -name: string
            -zipCode: string
