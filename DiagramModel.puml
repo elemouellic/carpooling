@@ -7,7 +7,7 @@ left to right direction
 
 
 package "Carpooling Model" as model{
-class User {
+entity User {
     -login: string
     -roles: array
     -password: string
