@@ -17,7 +17,7 @@ class Car
     #[ORM\Column(length: 255)]
     private ?string $carModel = null;
 
-    #[ORM\Column(length: 10)]
+    #[ORM\Column(length: 10, unique: true)]
     private ?string $matriculation = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]

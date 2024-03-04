@@ -15,7 +15,7 @@ class Brand
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $carBrand = null;
 
     #[ORM\OneToMany(targetEntity: Car::class, mappedBy: 'identify')]
