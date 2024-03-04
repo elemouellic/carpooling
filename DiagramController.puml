@@ -21,7 +21,7 @@ class CityController {
     +insertCity(Request $request, EntityManagerInterface $em) : Response
     +deleteCity(Request $request, int $id, EntityManagerInterface $em) : Response
     +listAllCities(EntityManagerInterface $em) : Response
-    +listAllZipCodes(EntityManagerInterface $em)
+    +listAllZipCodes(EntityManagerInterface $em) : Response
 }
 class StudentController {
     -tokenAuth : TokenAuth
