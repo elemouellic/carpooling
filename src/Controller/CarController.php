@@ -17,7 +17,7 @@ class CarController extends AbstractController
 
 
 
-    #[Route('/insertcar', name: 'app_car_insert', methods: ['POST'])]
+    #[Route('/insertVoiture', name: 'app_car_insert', methods: ['POST'])]
     public function insertCar(Request $request, EntityManagerInterface $em): JsonResponse
     {
 
@@ -81,7 +81,7 @@ class CarController extends AbstractController
         return new JsonResponse($result);
     }
 
-    #[Route('/deletecar/{id}', name: 'app_car_delete', methods: ['DELETE'])]
+    #[Route('/deleteVoiture/{id}', name: 'app_car_delete', methods: ['DELETE'])]
     public function deleteCar(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
 
@@ -105,7 +105,7 @@ class CarController extends AbstractController
         ]);
     }
 
-    #[Route('/listallcars', name: 'app_car_list', methods: ['GET'])]
+    #[Route('/listeVoiture', name: 'app_car_list', methods: ['GET'])]
     public function listAllCars(EntityManagerInterface $em): JsonResponse
     {
 

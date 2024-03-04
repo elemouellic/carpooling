@@ -26,7 +26,7 @@ class StudentController extends AbstractController
         $this->tokenAuth = $tokenAuth;
     }
 
-    #[Route('/insertstudent', name: 'app_student_insert', methods: ['POST'])]
+    #[Route('/insertPersonne', name: 'app_student_insert', methods: ['POST'])]
     public function insertStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
         try {
@@ -115,7 +115,7 @@ class StudentController extends AbstractController
         ]);
     }
 
-    #[Route('/updatestudent', name: 'app_student_update', methods: ['PUT'])]
+    #[Route('/updatePersonne', name: 'app_student_update', methods: ['PUT'])]
     public function updateStudent(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $response = null;
@@ -180,7 +180,7 @@ class StudentController extends AbstractController
         return $response;
     }
 
-    #[Route('/deletestudent/{id}', name: 'app_student_delete', methods: ['DELETE'])]
+    #[Route('/deletePersonne/{id}', name: 'app_student_delete', methods: ['DELETE'])]
     public function deleteStudent(int $id, EntityManagerInterface $em): JsonResponse
     {
 
@@ -210,7 +210,7 @@ class StudentController extends AbstractController
         ]);
     }
 
-    #[Route('/selectstudent/{id}', name: 'app_student_get', methods: ['GET'])]
+    #[Route('/selectPersonne/{id}', name: 'app_student_get', methods: ['GET'])]
     public function getStudent(int $id, EntityManagerInterface $em, Request $request): JsonResponse
     {
 
@@ -240,7 +240,7 @@ class StudentController extends AbstractController
         ]);
     }
 
-    #[Route('/listallstudents', name: 'app_student_list', methods: ['GET'])]
+    #[Route('/listPersonne', name: 'app_student_list', methods: ['GET'])]
     public function listAllStudents(EntityManagerInterface $em): JsonResponse
     {
 

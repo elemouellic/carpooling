@@ -27,7 +27,7 @@ class TripController extends AbstractController
         $this->tokenAuth = $tokenAuth;
     }
 
-    #[Route('/inserttrip', name: 'app_trip_insert', methods: ['POST'])]
+    #[Route('/insertTrajet', name: 'app_trip_insert', methods: ['POST'])]
     public function insertTrip(Request $request, EntityManagerInterface $em): JsonResponse
     {
         // Get the request data
@@ -128,7 +128,7 @@ class TripController extends AbstractController
         return new JsonResponse($result);
     }
 
-    #[Route('/searchtrip/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
+    #[Route('/rechercheTrajet/{idCityStart}/{idCityArrival}/{dateTravel}', name: 'app_trip_search', methods: ['GET'])]
     public function searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel): JsonResponse
     {
 
@@ -163,7 +163,7 @@ class TripController extends AbstractController
     }
 
 
-    #[Route('/listalltrips', name: 'app_trip_list', methods: ['GET'])]
+    #[Route('/listeTrajet', name: 'app_trip_list', methods: ['GET'])]
     public function listAllTrips(Request $request, EntityManagerInterface $em): JsonResponse
     {
 
@@ -186,7 +186,7 @@ class TripController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/deletetrip/{id}', name: 'app_trip_delete', methods: ['DELETE'])]
+    #[Route('/deleteTrajet/{id}', name: 'app_trip_delete', methods: ['DELETE'])]
     public function deleteTrip(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
 
@@ -211,7 +211,7 @@ class TripController extends AbstractController
     }
 
     // This routes refer to the association table between the trip and the student
-    #[Route('/insertparticipation', name: 'app_trip_insert_participation', methods: ['POST'])]
+    #[Route('/insertInscription', name: 'app_trip_insert_participation', methods: ['POST'])]
     public function insertParticipation(Request $request, EntityManagerInterface $em): JsonResponse
     {
         // Get the request data
@@ -269,7 +269,7 @@ class TripController extends AbstractController
         ]);
     }
 
-    #[Route('/listallparticipations', name: 'app_trip_list_participation', methods: ['GET'])]
+    #[Route('/listeInscription', name: 'app_trip_list_participation', methods: ['GET'])]
     public function listAllParticipations(Request $request, EntityManagerInterface $em): JsonResponse
     {
 
@@ -307,7 +307,7 @@ class TripController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/deleteparticipation/{tripid}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
+    #[Route('/deleteInscription/{tripid}', name: 'app_trip_delete_participation', methods: ['DELETE'])]
     public function deleteParticipation(Request $request, int $tripid, EntityManagerInterface $em): JsonResponse
     {
 
@@ -341,7 +341,7 @@ class TripController extends AbstractController
         ]);
     }
 
-    #[Route('/getdriverontrip/{tripid}', name: 'app_trip_get_driver', methods: ['GET'])]
+    #[Route('/listeInscriptionConducteur/{tripid}', name: 'app_trip_get_driver', methods: ['GET'])]
     public function getDriverOnTrip(Request $request, EntityManagerInterface $em, $tripid): JsonResponse
     {
 
@@ -370,7 +370,7 @@ class TripController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/getstudentontrips/{studentid}', name: 'app_trip_get_student', methods: ['GET'])]
+    #[Route('/listeInscriptionUser/{studentid}', name: 'app_trip_get_student', methods: ['GET'])]
     public function getStudentOnTrips(Request $request, EntityManagerInterface $em, $studentid): JsonResponse
     {
 

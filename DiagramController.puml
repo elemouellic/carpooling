@@ -8,55 +8,52 @@ package "Carpooling Controller"  as controller {
 abstract class AbstractController  {
 }
 class BrandController {
-    +createBrand() : Response
-    +updateBrand() : Response
-    +deleteBrand() : Response
-    +getBrand() : Response
-    +getBrands() : Response
+    +insertBrand(Request $request, EntityManagerInterface $em) : Response
+    +deleteBrand(Request $request, $id, EntityManagerInterface $em) : Response
+    +listAllBrands(EntityManagerInterface $em) : Response
 }
 class CarController {
-    +createCar() : Response
-    +updateCar() : Response
-    +deleteCar() : Response
-    +getCar() : Response
-    +getCars() : Response
+    +insertCar(Request $request, EntityManagerInterface $em) : Response
+    +deleteCar(Request $request, int $id, EntityManagerInterface $em) : Response
+    +listAllCars(EntityManagerInterface $em) : Response
 }
 class CityController {
-    +createCity() : Response
-    +updateCity() : Response
-    +deleteCity() : Response
-    +getCity() : Response
-    +getCities() : Response
+    +insertCity(Request $request, EntityManagerInterface $em) : Response
+    +deleteCity(Request $request, int $id, EntityManagerInterface $em) : Response
+    +listAllCities(EntityManagerInterface $em) : Response
+    +listAllZipCodes(EntityManagerInterface $em)
 }
 class StudentController {
     -tokenAuth : TokenAuth
-    +createStudent() : Response
-    +updateStudent() : Response
-    +deleteStudent() : Response
-    +getStudent() : Response
-    +getStudents() : Response
+    +insertStudent(Request $request, EntityManagerInterface $em) : Response
+    +updateStudent(Request $request, EntityManagerInterface $em) : Response
+    +deleteStudent(int $id, EntityManagerInterface $em) : Response
+    +getStudent(int $id, EntityManagerInterface $em, Request $request) : Response
+    +listAllStudents(EntityManagerInterface $em) : Response
 }
 class TripController {
     -tokenAuth : TokenAuth
-    +createTrip() : Response
-    +updateTrip() : Response
-    +deleteTrip() : Response
-    +getTrip() : Response
-    +getTrips() : Response
+    +insertTrip(Request $request, EntityManagerInterface $em) : Response
+    +searchTrip(Request $request, EntityManagerInterface $em, $idCityStart, $idCityArrival, $dateTravel) : Response
+    +listAllTrips(Request $request, EntityManagerInterface $em) : Response
+    +deleteTrip(Request $request, int $id, EntityManagerInterface $em) : Response
+    +insertParticipation(Request $request, EntityManagerInterface $em) : Response
+    +listAllParticipations(Request $request, EntityManagerInterface $em) : Response
+    +deleteParticipation(Request $request, int $tripid, EntityManagerInterface $em) : Response
+    +getDriverOnTrip(Request $request, EntityManagerInterface $em, $tripid) : Response
+    +getStudentOnTrips(Request $request, EntityManagerInterface $em, $studentid) : Response
+
 }
 class UserController {
     -passwordHasher : UserPasswordHasherInterface
-    +createUser() : Response
-    +updateUser() : Response
-    +deleteUser() : Response
-    +getUser() : Response
-    +getUsers() : Response
+    +register(Request $request, EntityManagerInterface $em) : Response
+    +login(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher) : Response
 }
 AbstractController ^-down- BrandController
-AbstractController ^-down- CarController
-AbstractController ^-down- CityController
-AbstractController ^-down- StudentController
-AbstractController ^-down- TripController
+AbstractController ^-down-- CarController
+AbstractController ^-down--- CityController
+AbstractController ^-down--- StudentController
+AbstractController ^-down-- TripController
 AbstractController ^-down- UserController
 
 @enduml

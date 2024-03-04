@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class BrandController extends AbstractController
 {
 
-    #[Route('/insertbrand', name: 'app_brand_insert', methods: ['POST'])]
+    #[Route('/insertMarque', name: 'app_brand_insert', methods: ['POST'])]
     public function insertBrand(Request $request, EntityManagerInterface $em): JsonResponse
     {
 
@@ -55,7 +55,7 @@ class BrandController extends AbstractController
         // Return the brand data
         return new JsonResponse($result);
     }
-    #[Route('/deletebrand/{id}', name: 'app_brand_delete', methods: ['DELETE'])]
+    #[Route('/deleteMarque/{id}', name: 'app_brand_delete', methods: ['DELETE'])]
     public function deleteBrand(Request $request, $id, EntityManagerInterface $em): JsonResponse
     {
         // Get the brand from the database
@@ -84,7 +84,7 @@ class BrandController extends AbstractController
         ]);
     }
 
-    #[Route('/listallbrands', name: 'app_brand_list', methods: ['GET'])]
+    #[Route('/listeMarque', name: 'app_brand_list', methods: ['GET'])]
     public function listAllBrands(EntityManagerInterface $em): JsonResponse
     {
 

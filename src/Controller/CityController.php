@@ -16,7 +16,7 @@ class CityController extends AbstractController
 {
 
 
-    #[Route('/insertcity', name: 'app_city_insert', methods: ['POST'])]
+    #[Route('/insertVille', name: 'app_city_insert', methods: ['POST'])]
     public function insertCity(Request $request, EntityManagerInterface $em): JsonResponse
     {
 
@@ -65,7 +65,7 @@ class CityController extends AbstractController
 
     }
 
-#[Route('/deletecity/{id}', name: 'app_city_delete', methods: ['DELETE'])]
+#[Route('/deleteVille/{id}', name: 'app_city_delete', methods: ['DELETE'])]
     public function deleteCity(Request $request, int $id, EntityManagerInterface $em): JsonResponse
     {
 
@@ -90,7 +90,7 @@ class CityController extends AbstractController
         ]);
     }
 
-    #[Route('/listallcities', name: 'app_city_list', methods: ['GET'])]
+    #[Route('/listeVille', name: 'app_city_list', methods: ['GET'])]
     public function listAllCities(EntityManagerInterface $em): JsonResponse
     {
 
@@ -111,7 +111,7 @@ class CityController extends AbstractController
         // Return the cities data
         return $this->json($data);
     }
-    #[Route('/listallzipcodes', name: 'app_zipcode_list', methods: ['GET'])]
+    #[Route('/listeCodePostal', name: 'app_zipcode_list', methods: ['GET'])]
     public function listAllZipCodes(EntityManagerInterface $em): JsonResponse
     {
         // Get all cities from the database
